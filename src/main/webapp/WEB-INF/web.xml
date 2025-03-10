@@ -100,6 +100,14 @@
         <servlet-name>resetPasswordServlet</servlet-name>
         <servlet-class>Controller.resetPasswordServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>editCommentServlet</servlet-name>
+        <servlet-class>Controller.editCommentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>deleteCommentServlet</servlet-name>
+        <servlet-class>Controller.deleteCommentServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>adListServlet</servlet-name>
         <url-pattern>/List</url-pattern>
@@ -195,7 +203,6 @@
         <servlet-name>LikeCommentServlet</servlet-name>
         <url-pattern>/LikeComment</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>requestPasswordServlet</servlet-name>
         <url-pattern>/requestPassword</url-pattern>
@@ -203,6 +210,14 @@
     <servlet-mapping>
         <servlet-name>resetPasswordServlet</servlet-name>
         <url-pattern>/resetPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>editCommentServlet</servlet-name>
+        <url-pattern>/editComment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>deleteCommentServlet</servlet-name>
+        <url-pattern>/deleteComment</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -67,11 +67,12 @@ public class CommentServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         int productId = Integer.parseInt(request.getParameter("product-id"));
-        System.out.println("prodId" + productId);
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        System.out.println("uuu" + productId);
         if (productId != 0) {
             // Gọi DAO để lấy danh sách comment từ DB
             CommentDAO comDAO = new CommentDAO();
-            List<Comment> comments = comDAO.getCommentByProductId(productId);
+            List<Comment> comments = comDAO.getCommentByProductId(productId,userId);
             System.out.println("com" + comments);
             // Chuyển danh sách thành JSON và trả về client
             String json = new Gson().toJson(comments);
@@ -119,6 +120,13 @@ public class CommentServlet extends HttpServlet {
             // Lấy giá trị từ JSON
             int userId = jsonObject.get("user_id").getAsInt();
             int productId = jsonObject.get("product_id").getAsInt();
+            Integer parentId = null;
+            if (jsonObject.has("parent_id") && !jsonObject.get("parent_id").isJsonNull()) {
+                parentId = jsonObject.get("parent_id").getAsInt();
+            } else {
+                parentId = 0; // Nếu không có parent_id thì mặc định là 0
+            }
+
             String content = jsonObject.get("content").getAsString();
 
             // Kiểm tra dữ liệu hợp lệ
@@ -128,7 +136,9 @@ public class CommentServlet extends HttpServlet {
             }
 
             // Lưu comment vào DB
-            int num = comDAO.saveCommentDB(userId, productId, content);
+            int num = comDAO.saveCommentDB(userId, productId, content, parentId);
+            System.out.println("u" + userId);
+            System.out.println("p" + productId);
             Integer commentId = comDAO.getCommentId(userId, productId);
 
             // Kiểm tra commentId có null không

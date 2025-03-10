@@ -6,6 +6,8 @@
 package DAO;
 
 import db.DBContext;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,64 +27,131 @@ public class OrderDAO extends DBContext {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
 
-        // Tính nextId một lần trước khi vào vòng lặp
-        String sqlNextId = "SELECT ISNULL(MAX(order_Id), 0) + 1 as nextId FROM Orders";
-        int nextId = 0;
-        try ( ResultSet rs = execSelectQuery(sqlNextId)) {
-            if (rs.next()) {
-                nextId = rs.getInt("nextId");
+        String getOrderIdSql = "SELECT MAX(Order_Id) FROM Orders";
+        String getOrderDetailIdSql = "SELECT MAX(Order_Detail_Id) FROM Order_Details";
+        String getExistingOrderSql = "SELECT Order_Id FROM Orders WHERE Customer_Id = ? AND Status = 'Pending'";
+
+        String insertOrderSql = "INSERT INTO Orders (Order_Id, Customer_Id, Email, Phone, Street, Ward, District, City, Country, "
+                + "Voucher_Id, Transport_Id, Order_Date, Total_Price, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)";
+
+        String insertOrderDetailSql = "INSERT INTO Order_Details (Order_Detail_Id, Product_Id, Order_Id, Quantity, Price) VALUES (?, ?, ?, ?, ?)";
+
+        String updateOrderDetailSql = "UPDATE Order_Details SET Quantity = ?, Price = ? WHERE Order_Id = ? AND Product_Id = ?";
+
+        int orderId = 0;
+        int nextOrderDetailId = 0;
+
+        Connection conn = null;
+
+        try {
+            conn = getConnection(); // Lấy một kết nối duy nhất
+            conn.setAutoCommit(false);  // Bắt đầu transaction
+
+            // Kiểm tra xem Order_Id đã tồn tại chưa
+            try ( PreparedStatement ps = conn.prepareStatement(getExistingOrderSql)) {
+                ps.setInt(1, customerId);
+                try ( ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        orderId = rs.getInt("Order_Id");
+                    }
+                }
             }
-        }
 
-        String updateOrder = "UPDATE Order_Details SET Quantity = ? WHERE Product_Id = ? AND Order_Id = ?";
+            // Lấy Order_Detail_Id lớn nhất hiện tại
+            try ( PreparedStatement ps = conn.prepareStatement(getOrderDetailIdSql);  ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    nextOrderDetailId = rs.getInt(1) + 1;
+                } else {
+                    nextOrderDetailId = 1;
+                }
+            }
 
-        String insertOrder = "NSERT INTO Orders (Customer_Id, Email, Phone, Street, Ward, District, City, Country, \n"
-                + "Voucher_Id, Transport_Id, Order_Date, Total_Price, Status) \n"
-                + "VALUES (?, ?, ?, ?, ?, ?,?, ?, null, null, ?, ?, ?);";
+            // Nếu chưa có Order, tạo mới
+            if (orderId == 0) {
+                try ( PreparedStatement ps = conn.prepareStatement(getOrderIdSql);  ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        orderId = rs.getInt(1) + 1;
+                    } else {
+                        orderId = 1;
+                    }
+                }
 
-        String insertOrderDetail = "INSERT INTO Order_Details (Product_Id,Order_ID,Quantity,Price)"
-                + "VALUES (?, ?, ?, ?)";
-        for (Order order : cDAO.getProductsInCart(customerId)) {
-            // Cập nhật nếu sản phẩm đã tồn tại
-            Products prod = pDAO.getProductById(order.getProductId());
+                try ( PreparedStatement ps = conn.prepareStatement(insertOrderSql)) {
+                    ps.setInt(1, orderId);
+                    ps.setInt(2, customerId);
+                    for (int i = 3; i <= 9; i++) {
+                        ps.setString(i, ""); // Điền các cột rỗng
+                    }
+                    ps.setTimestamp(10, new java.sql.Timestamp(System.currentTimeMillis()));
+                    ps.setDouble(11, 0);
+                    ps.setString(12, "Pending");
+                    rowsAffected += ps.executeUpdate();
+                }
+            }
 
-            Object[] updateParams = {order.getAmount(), order.getProductId(), nextId};
-            int updatedRows = execQuery(updateOrder, updateParams);
-            System.out.println("updatedRows " + updatedRows);
-            if (updatedRows == 0) { // Nếu không có dòng nào được cập nhật, thêm mới sản phẩm
-                Object[] insertParams = {
-                    nextId, // Order_ID, tăng nextId cho mỗi sản phẩm mới
-                    customerId,
-                    "", // Email
-                    "", // Phone
-                    "", // Strees
-                    "", // Ward
-                    "", // District
-                    "", // City
-                    "", // Country
-                    null, // Voucher_Id (có thể NULL)
-                    null, // Transport_Id (có thể NULL)
-                    new java.sql.Timestamp(System.currentTimeMillis()), // Order_Date
-                    order.getTotalPrice(), // TotalPrice
-                    "Pending", // Status
-                };
-                Object[] insertParamsDetail = {
-                    nextId,
-                    order.getProductId(),
-                    order.getAmount(),
-                    order.getAmount()*prod.getPrice()
-                };
-                rowsAffected += execQuery(insertOrder, insertParams);
-                rowsAffected += execQuery(insertOrderDetail, insertParamsDetail);
-            } else {
-                rowsAffected += updatedRows;
+            // Duyệt qua giỏ hàng để cập nhật Order_Details
+            for (Order order : cDAO.getProductsInCart(customerId)) {
+                Products prod = pDAO.getProductById(order.getProductId());
+
+                // Kiểm tra xem sản phẩm đã tồn tại trong Order_Details chưa
+                boolean exists = false;
+                String checkExistSql = "SELECT COUNT(*) FROM Order_Details WHERE Order_Id = ? AND Product_Id = ?";
+                try ( PreparedStatement ps = conn.prepareStatement(checkExistSql)) {
+                    ps.setInt(1, orderId);
+                    ps.setInt(2, order.getProductId());
+                    try ( ResultSet rs = ps.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            exists = true;
+                        }
+                    }
+                }
+
+                if (exists) {
+                    // Nếu sản phẩm đã có trong Order_Details, cập nhật số lượng
+                    try ( PreparedStatement ps = conn.prepareStatement(updateOrderDetailSql)) {
+                        ps.setInt(1, order.getAmount());
+                        ps.setDouble(2, order.getAmount() * prod.getPrice());
+                        ps.setInt(3, orderId);
+                        ps.setInt(4, order.getProductId());
+                        rowsAffected += ps.executeUpdate();
+                    }
+                } else {
+                    // Nếu chưa có, thêm mới vào Order_Details
+                    try ( PreparedStatement ps = conn.prepareStatement(insertOrderDetailSql)) {
+                        ps.setInt(1, nextOrderDetailId);
+                        ps.setInt(2, order.getProductId());
+                        ps.setInt(3, orderId);
+                        ps.setInt(4, order.getAmount());
+                        ps.setDouble(5, order.getAmount() * prod.getPrice());
+                        rowsAffected += ps.executeUpdate();
+                        nextOrderDetailId++;
+                    }
+                }
+            }
+
+            conn.commit(); // Xác nhận transaction
+        } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback(); // Nếu có lỗi, rollback transaction
+            }
+            e.printStackTrace();
+            return 0;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close(); // Đóng kết nối sau khi xong
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
         return rowsAffected;
     }
 
-    public int orderedSuccess(int userId, Order order, CartDAO cDAO) throws SQLException {
+    public int orderedSuccess(int userId, Order order, CartDAO cDAO, int voucher, int transport) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
 
@@ -95,9 +164,9 @@ public class OrderDAO extends DBContext {
             }
         }
 
-        String sql = "UPDATE Orders SET street = ?, ward = ?, district = ?, city = ?, country = ?, phone = ?, order_date = GETDATE(), status = ?, totalPrice = ?, email = ? WHERE Order_ID = ?";
-        String updateStock = "UPDATE products SET countinstock = ?, selled = ? WHERE Product_ID = ?";
-
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?, Phone = ?,Voucher_Id = ?,Transport_Id = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Order_Id = ?";
+        String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
+       
         for (int orderId : pendingOrderIds) {
             Object[] orderParams = {
                 order.getStreet(),
@@ -106,6 +175,8 @@ public class OrderDAO extends DBContext {
                 order.getCity(),
                 order.getCountry(),
                 order.getPhone(),
+                voucher ,
+                transport ,
                 order.getStatus(),
                 order.getTotalPrice(),
                 order.getEmail(),
@@ -128,6 +199,7 @@ public class OrderDAO extends DBContext {
                         rowsAffected += affectedRows;
                     } else {
                         System.out.println("Insufficient stock for Product_ID: " + cartOrder.getProductId());
+                        return 0; // Không tiếp tục nếu hết hàng
                     }
                 } else {
                     System.out.println("Product not found for ID: " + cartOrder.getProductId());
@@ -144,14 +216,14 @@ public class OrderDAO extends DBContext {
 
     public ArrayList<Products> getProductByUserId(int userId) {
         ArrayList<Products> prod = new ArrayList<>();
-        String sql = "SELECT p.*, b.Brand_Name, o.Quantity, os.status, cat.Category_Name\n"
+        String sql = "SELECT p.*, cat.Category_Name ,b.Brand_Name, o.Quantity, os.Status\n"
                 + "FROM Products p\n"
                 + "JOIN Brands b ON p.Brand_Id = b.Brand_ID\n"
                 + "JOIN Order_Details o ON o.Product_ID = p.Product_ID\n"
                 + "JOIN Orders os ON os.Order_Id = o.Order_Id\n"
                 + "JOIN Customers c ON c.Customer_ID = os.Customer_Id\n"
                 + "JOIN Categories cat ON p.Category_Id = cat.Category_Id\n"
-                + "WHERE c.Customer_ID = '?'";
+                + "WHERE c.Customer_ID = ?";
         Object[] params = {userId};
 
         try ( ResultSet rs = execSelectQuery(sql, params)) {
@@ -321,4 +393,3 @@ public class OrderDAO extends DBContext {
     }
 
 }
-

@@ -84,7 +84,8 @@ public class ProductDAO extends DBContext {
         try ( ResultSet rs = execSelectQuery(query)) {
             // Lặp qua từng hàng trong tập kết quả
             while (rs.next()) {
-                String[] image = rs.getString(8).split(","); // Tách chuỗi hình ảnh
+                String imgData = rs.getString(9);
+                String[] image = (imgData != null) ? imgData.split(",") : new String[]{""};
                 // Tạo đối tượng Products bằng dữ liệu từ từng cột và thêm vào danh sách
                 prod.add(new Products(
                         rs.getInt(1), // Cột ID
@@ -93,9 +94,9 @@ public class ProductDAO extends DBContext {
                         rs.getInt(6), // Cột selled
                         rs.getDouble(7), // Cột giá
                         image[0], // Mảng hình ảnh từ cột hình ảnh
-                        rs.getString(9), // Cột tên thương hiệu
-                        rs.getString(10), // Cột trạng thái
-                        rs.getString(11)
+                        rs.getString(10), // Cột tên thương hiệu
+                        rs.getString(11), // Cột trạng thái
+                        rs.getString(12)
                 ));
             }
         } catch (Exception e) {
@@ -116,10 +117,10 @@ public class ProductDAO extends DBContext {
         try ( ResultSet rs = execSelectQuery(query, params)) {
             // Lặp qua từng hàng trong tập kết quả
             if (rs.next()) {
-                String[] image = rs.getString(8).split(",");
+                String[] image = rs.getString(9).split(",");
                 return new Products(
                         rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6),
-                        rs.getDouble(7), image[0], rs.getString(9), rs.getString(10), rs.getString(11)
+                        rs.getDouble(7), image[0], rs.getString(10), rs.getString(11), rs.getString(12)
                 );
             }
         } catch (Exception e) {
@@ -143,8 +144,8 @@ public class ProductDAO extends DBContext {
 
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = rs.getString(8).split(",");  // Tách chuỗi hình ảnh
-                prod.add(new Products(rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6), rs.getDouble(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11)));
+                String[] image = rs.getString(9).split(",");  // Tách chuỗi hình ảnh
+                prod.add(new Products(rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6), rs.getDouble(7), image[0], rs.getString(10), rs.getString(11), rs.getString(12)));
                 System.out.println("id:" + id);
             }
         } catch (Exception e) {
@@ -233,7 +234,7 @@ public class ProductDAO extends DBContext {
         Object[] params = {category, offset, itemsPerPage};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = rs.getString(8).split(",");
+                String[] image = rs.getString(9).split(",");
                 type.add(new Products(
                         rs.getInt(1), // Product_ID
                         rs.getString(2), // Product_Name
@@ -241,9 +242,9 @@ public class ProductDAO extends DBContext {
                         rs.getInt(6), // Selled
                         rs.getDouble(7), // Price
                         image[0], // Image
-                        rs.getString(9), // Brand_Name
-                        rs.getString(10), // Category_Name
-                        rs.getString(11) // Description
+                        rs.getString(10), // Brand_Name
+                        rs.getString(11), // Category_Name
+                        rs.getString(12) // Description
                 ));
             }
         } catch (Exception e) {
@@ -267,7 +268,7 @@ public class ProductDAO extends DBContext {
 
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = rs.getString(8).split(","); // Tách chuỗi hình ảnh
+                String[] image = rs.getString(9).split(","); // Tách chuỗi hình ảnh
                 prod.add(new Products(
                         rs.getInt(1), // Cột ID
                         rs.getString(2), // Cột tên sản phẩm
@@ -275,9 +276,9 @@ public class ProductDAO extends DBContext {
                         rs.getInt(6), // Cột selled
                         rs.getDouble(7), // Cột giá
                         image[0], // Mảng hình ảnh từ cột hình ảnh
-                        rs.getString(9), // Cột tên thương hiệu
-                        rs.getString(10), // Cột trạng thái
-                        rs.getString(11) // Cột mô tả
+                        rs.getString(10), // Cột tên thương hiệu
+                        rs.getString(11), // Cột trạng thái
+                        rs.getString(12) // Cột mô tả
                 ));
             }
             System.out.println("Found products: " + prod.size());
@@ -322,10 +323,10 @@ public class ProductDAO extends DBContext {
         Object[] params = {brand, offset, itemsPerPage};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = rs.getString(8).split(",");
+                String[] image = rs.getString(9).split(",");
                 Products product = new Products(
                         rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6), rs.getDouble(7),
-                        image[0], rs.getString(9), rs.getString(10), rs.getString(11)
+                        image[0], rs.getString(10), rs.getString(11), rs.getString(12)
                 );
                 type.add(product);
                 System.out.println("Product: " + product.getProductName() + ", Category: " + product.getType());
@@ -373,7 +374,7 @@ public class ProductDAO extends DBContext {
 
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = rs.getString(8).split(",");
+                String[] image = rs.getString(9).split(",");
                 prod.add(new Products(
                         rs.getInt(1), // Product_ID
                         rs.getString(2), // Product_Name
@@ -381,9 +382,9 @@ public class ProductDAO extends DBContext {
                         rs.getInt(6), // Selled
                         rs.getDouble(7), // Price
                         image[0], // Image
-                        rs.getString(9), // Brand_Name
-                        rs.getString(10),// Category_Name
-                        rs.getString(11) // Description
+                        rs.getString(10), // Brand_Name
+                        rs.getString(11),// Category_Name
+                        rs.getString(12) // Description
                 ));
             }
             System.out.println("Found products: " + prod.size());
