@@ -11,6 +11,9 @@ public class Comment {
     private int parentId;
     private String commentText;
     private LocalDateTime createdAt;
+    private int likeCount;
+    private boolean isLiked;
+    private String userName;
 
     // ✅ Constructor cần có đầy đủ tham số
     public Comment(int id, int customerId, int productId, int parentId, String commentText, LocalDateTime createdAt) {
@@ -21,7 +24,29 @@ public class Comment {
         this.commentText = commentText;
         this.createdAt = createdAt;
     }
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+
+    public Comment(int id, int customerId, int productId, int parentId, String commentText, LocalDateTime createdAt, int likeCount, boolean isLiked, String userName) {
+        this.id = id;
+        this.customerId = customerId;
+        this.productId = productId;
+        this.parentId = parentId;
+        this.commentText = commentText;
+        this.createdAt = createdAt;
+        this.likeCount = likeCount;
+        this.isLiked = isLiked;
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     public int getId() {
         return id;
@@ -69,6 +94,21 @@ public class Comment {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean isLiked) {
+        this.isLiked = isLiked;
     }
 
     // Định dạng ngày giờ khi cần hiển thị

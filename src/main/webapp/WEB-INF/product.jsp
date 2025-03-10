@@ -34,6 +34,7 @@
         <!-- Font Awesome Icon -->
         <link rel="stylesheet" href="assets/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -106,7 +107,7 @@
                                 <a class="dropdown-toggle" href="Checkout" id="navbarDropdownMenuLink" 
                                    aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-bag-heart-fill" style="font-size: 24px;"></i>
-                                    <div class="qty num-order">${SHOP.size() > 0 ? SHOP.size(): 0}</div>
+                                   <div class="qty num-order">${SHOP.size() > 0 ? SHOP.size(): 0}</div>
                                 </a>
                             </div>
                             <!-- /Cart -->
@@ -301,7 +302,7 @@
                     <!-- product tab nav -->
                     <ul class="tab-nav">
                         <li class="active"><a data-toggle="tab" href="#tab1">Description</a></li>
-                        <li><a data-toggle="tab" href="#tab2">Comments</a></li>
+                        <li><a onclick="loadComments('${User.fullname}', '${prodDetails.productId}', '${User.userId}')" data-toggle="tab" href="#tab2">Comments</a></li>
                     </ul>
                     <!-- /product tab nav -->
 
@@ -330,7 +331,7 @@
                                 gap: 10px;
                                 margin-bottom: 10px;
                             }
-                          
+
                             .comment-header input,
                             .comment-header textarea {
                                 width: 100%;
@@ -440,6 +441,15 @@
                             .reply-box .send {
                                 background: #28a745;
                                 color: white;
+
+                            }
+                            .edit-save {
+                                background: #007bff;
+                                color: white;
+                                padding: 5px 10px;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
                             }
                             .reply-box .cancel {
                                 background: #dc3545;
@@ -450,10 +460,28 @@
                                 font-size: 12px;
                                 color: darkgray;
                             }
+                            .content-container {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px; /* Khoảng cách giữa nội dung và icon */
+                            }
+
+                            .edit-icon, .delete-icon {
+                                color: gray;
+                                transition: color 0.2s;
+                            }
+
+                            .edit-icon:hover {
+                                color: #4CAF50; /* Màu xanh lá khi hover */
+                            }
+
+                            .delete-icon:hover {
+                                color: red; /* Màu đỏ khi hover */
+                            }
                         </style>
 
                         <!-- tab2 -->
-                        <div id="tab2" class="tab-pane fade">
+                        <div  id="tab2" class="tab-pane fade">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="comment-box">                      
@@ -473,165 +501,127 @@
                         <script>
 
                             // Lưu trạng thái like của từng người dùng (giả lập backend)
-                            var likedComments = {}; // Định dạng: { commentId: [userId1, userId2] }
-                            var userId = '${User.userId}'; // ✅ Gán giá trị từ backend vào biến
-
+                            let userId = parseInt('${User.userId}'); // ✅ Gán giá trị từ backend vào biến
+                            let productId = parseInt('${prodDetails.productId}');
                             function addComment() {
                                 if (!userId || userId === 'null' || userId === 'undefined') {
                                     showToast('Please login to use comments!', '');
                                     return;
                                 }
-                                var commentText = document.getElementById("commentInput").value.trim();
+                                let commentText = document.getElementById("commentInput").value.trim();
+                                console.log(commentText.value);
                                 if (commentText === "") {
                                     showToast('Please enter the content!', '');
                                     return;
                                 }
 
-                                // Tạo commentId duy nhất (có thể dùng ID từ backend nếu có)
-//                                var commentId = "cmt_" + new Date().getTime();
-
-                                var commentDiv = createCommentElement('${User.fullname}', commentText, userId);
-                                document.getElementById("commentsList").appendChild(commentDiv);
-                                document.getElementById("commentInput").value = "";
+                                addCommentServer('${User.fullname}', parseInt(userId), parseInt(productId), commentText)
                             }
-                            function timeAgo(timestamp) {
-                                const now = Date.now(); // Lấy timestamp hiện tại (milliseconds)
-                                const past = new Date(timestamp).getTime(); // Chuyển timestamp đầu vào về milliseconds
-
-                                if (isNaN(past))
-                                    return "Không xác định"; // Kiểm tra nếu timestamp không hợp lệ
-
-                                const diff = Math.floor((now - past) / 1000); // Chênh lệch thời gian tính theo giây
-
-                                if (diff < 60) {
-                                    return `${diff} giây trước`;
-                                } else if (diff < 3600) {
-                                    return `${Math.floor(diff / 60)} phút trước`;
-                                } else if (diff < 86400) {
-                                    return `${Math.floor(diff / 3600)} giờ trước`;
-                                } else {
-                                    return `${Math.floor(diff / 86400)} ngày trước`;
-                                }
-                            }
-
-
-
-
-// Hàm tạo bình luận
                             // Hàm tạo bình luận
-                            function createCommentElement(name, content, commentId) {
-                                const now = new Date();
-                                const dateString = now.toLocaleDateString("vi-VN");
-                                const timeString = now.toLocaleTimeString("vi-VN", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                });
-
+                            function createCommentElement(name, content, createAt, commentId, productId) {
                                 var commentDiv = document.createElement("div");
                                 commentDiv.classList.add("comment");
-                                commentDiv.dataset.commentId = commentId; // Gán ID cho comment
+                                commentDiv.dataset.commentId = commentId;
+                                commentDiv.dataset.userId = userId;
 
                                 var avatarDiv = document.createElement("div");
                                 avatarDiv.classList.add("avatar");
                                 avatarDiv.textContent = "👤";
+
                                 var commentWrapper = document.createElement("div");
                                 commentWrapper.classList.add("comment-wrapper");
+
                                 var nameDiv = document.createElement("div");
                                 nameDiv.classList.add("comment-name");
                                 nameDiv.textContent = name;
+
+                                // 🛠️ Tạo container chứa nội dung + icon (để tránh lỗi ReferenceError)
+                                var contentContainer = document.createElement("div");
+                                contentContainer.classList.add("content-container");
+                                contentContainer.style.display = "flex";
+                                contentContainer.style.alignItems = "center";
+                                contentContainer.style.gap = "10px"; // Khoảng cách giữa nội dung và icon
+
+                                // 📝 Tạo div chứa nội dung bình luận
                                 var contentDiv = document.createElement("div");
                                 contentDiv.classList.add("comment-content");
                                 contentDiv.textContent = content;
+                                contentDiv.style.flex = "1"; // Giúp nội dung mở rộng, tránh icon bị đẩy xuống hàng
+
+                                // ✏️ Tạo icon Edit
+                                var editIcon = document.createElement("i");
+                                editIcon.classList.add("fa-solid", "fa-pen-to-square", "edit-icon");
+                                editIcon.style.cursor = "pointer";
+                                editIcon.style.color = "gray";
+                                editIcon.onclick = function () {
+                                    editComment(commentId, contentDiv);
+                                };
+
+                                // 🗑️ Tạo icon Delete
+                                var deleteIcon = document.createElement("i");
+                                deleteIcon.classList.add("fa-solid", "fa-trash", "delete-icon");
+                                deleteIcon.style.cursor = "pointer";
+                                deleteIcon.style.color = "gray";
+                                deleteIcon.onclick = function () {
+                                    deleteComment(commentId, commentDiv);
+                                };
+
+                                // 🛠️ Gộp tất cả vào container
+                                contentContainer.appendChild(contentDiv);
+                                contentContainer.appendChild(editIcon);
+                                contentContainer.appendChild(deleteIcon);
+
                                 var actionsBar = document.createElement("div");
                                 actionsBar.classList.add("comment-actions-bar");
-                                var likeButton = document.createElement("span");
-                                likeButton.textContent = "Like (0)";
-                                likeButton.onclick = function () {
-                                    toggleLike(commentId, likeButton);
+
+                                let likeContainer = document.createElement("div");
+                                likeContainer.classList.add("like-container");
+                                likeContainer.style.display = "flex";
+                                likeContainer.style.alignItems = "center";
+                                likeContainer.style.gap = "5px";
+
+                                let likeText = document.createElement("span");
+                                likeText.textContent = "Like";
+                                likeText.style.cursor = "pointer";
+
+                                let likeCount = document.createElement("span");
+                                likeCount.classList.add("like-count");
+                                likeCount.textContent = "(0)";
+                                likeCount.style.fontWeight = "bold";
+
+                                likeContainer.appendChild(likeText);
+                                likeContainer.appendChild(likeCount);
+                                likeContainer.onclick = function () {
+                                    toggleLikeServer(likeContainer, likeCount);
                                 };
+
                                 var replyButton = document.createElement("span");
                                 replyButton.textContent = "Reply";
                                 replyButton.onclick = function () {
-                                    showReplyBox('${User.fullname}', commentDiv);
+                                    replyComment('${User.fullname}', userId, productId, commentId, commentDiv);
                                 };
-                                actionsBar.appendChild(likeButton);
+
+                                actionsBar.appendChild(likeContainer);
                                 actionsBar.appendChild(replyButton);
                                 commentWrapper.appendChild(nameDiv);
-                                commentWrapper.appendChild(contentDiv);
+                                commentWrapper.appendChild(contentContainer); // 🛠️ Thay contentDiv bằng contentContainer
                                 commentWrapper.appendChild(actionsBar);
+
                                 var repliesDiv = document.createElement("div");
                                 repliesDiv.classList.add("replies");
 
                                 var timeDiv = document.createElement("div");
                                 timeDiv.classList.add("comment-time");
-                                timeDiv.textContent = timeString + " " + dateString
-                                // Cập nhật thời gian hiển thị mỗi phút
-                                setInterval(() => {
-                                    timeDiv.textContent = timeAgo(timestamp);
-                                }, 60000);
-                                actionsBar.appendChild(timeDiv);
+                                timeDiv.textContent = createAt;
 
+                                actionsBar.appendChild(timeDiv);
                                 commentDiv.appendChild(avatarDiv);
                                 commentDiv.appendChild(commentWrapper);
                                 commentDiv.appendChild(repliesDiv);
+
                                 return commentDiv;
                             }
-// Hàm xử lý like/unlike
-                            function toggleLike(commentId, likeButton) {
-                                if (!likedComments[commentId]) {
-                                    likedComments[commentId] = new Set();
-                                }
-                                var userLikes = likedComments[commentId];
-                                console.log(userLikes.size);
-                                if (userLikes.has(commentId)) {
-                                    // Nếu đã like => Unlike
-                                    userLikes.delete(commentId);
-                                } else {
-                                    // Nếu chưa like => Like
-                                    userLikes.add(commentId);
-                                }
-                                console.log(userLikes.size);
-                                let num = userLikes.size
-                                // Cập nhật số lượng like
-                                likeButton.textContent = `Like (` + num + `)`;
-                                likeButton.style.color = userLikes.has(commentId) ? '#007bff' : 'black';
-                            }
 
-// Hiển thị khung trả lời
-                            function showReplyBox(name, commentDiv) {
-                                var existingReplyBox = commentDiv.querySelector(".reply-box");
-                                if (existingReplyBox) {
-                                    existingReplyBox.remove();
-                                    return;
-                                }
-
-                                var replyBox = document.createElement("div");
-                                replyBox.classList.add("reply-box");
-                                var replyInput = document.createElement("input");
-                                replyInput.placeholder = "Reply...";
-                                var sendButton = document.createElement("button");
-                                sendButton.classList.add("send");
-                                sendButton.textContent = "Send";
-                                sendButton.onclick = function () {
-                                    if (replyInput.value.trim() !== "") {
-                                        var replyDiv = createCommentElement(name, replyInput.value.trim(), "reply_" + new Date().getTime());
-                                        commentDiv.querySelector(".replies").appendChild(replyDiv);
-                                        replyBox.remove();
-                                    } else {
-                                        showToast('Please enter reply!', '');
-                                    }
-                                };
-                                var cancelButton = document.createElement("button");
-                                cancelButton.classList.add("cancel");
-                                cancelButton.textContent = "Cancel";
-                                cancelButton.onclick = function () {
-                                    replyBox.remove();
-                                };
-                                replyBox.appendChild(replyInput);
-                                replyBox.appendChild(sendButton);
-                                replyBox.appendChild(cancelButton);
-                                commentDiv.appendChild(replyBox);
-                            }
 
                         </script>
                         <!-- /tab2 -->
@@ -826,6 +816,8 @@
 <script src="assets/js/Coupon/coupon.js"></script>
 <script src="assets/js/utils/addtocart.js"></script>
 <script src="assets/js/utils/notification.js"></script>
+<script src="assets/js/utils/addComment.js"></script>
+
 <!-- ToastyFy -->
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 

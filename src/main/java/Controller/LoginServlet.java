@@ -61,7 +61,6 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("User", user);
                     session.setAttribute("email", user.getEmail());
                     session.setAttribute("isAdmin", user.isIsAdmin());
-
                     response.sendRedirect("Home");
                 } catch (SQLException ex) {
                     Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);

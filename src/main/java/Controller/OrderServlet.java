@@ -41,6 +41,10 @@ public class OrderServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String total = request.getParameter("total");
+        int voucher = 0;
+        int transport = 0;
+        voucher = Integer.parseInt(request.getParameter("voucher"));
+        transport = Integer.parseInt(request.getParameter("transport"));
         ProductDAO pDAO = new ProductDAO();
         OrderDAO oDAO = new OrderDAO();
         UserDAO uDAO = new UserDAO();
@@ -69,7 +73,7 @@ public class OrderServlet extends HttpServlet {
 
         // Tạo đối tượng Order với thông tin người dùng
         Order order = new Order(user.getStreet(), user.getWard(), user.getDistrict(), user.getCity(),
-                user.getCountry(), user.getPhone(), "Processing", Double.parseDouble(total), user.getEmail(), userId);
+                user.getCountry(), user.getPhone(), "Ordered", Double.parseDouble(total), user.getEmail(), userId);
 
         // Kiểm tra và cập nhật từng sản phẩm trong giỏ hàng
         try {
@@ -90,8 +94,9 @@ public class OrderServlet extends HttpServlet {
             if (stockAvailable && cDAO != null) {
                 // Lưu giỏ hàng vào cơ sở dữ liệu và cập nhật thông tin đơn hàng
                 oDAO.saveCartToDatabase(userId, cDAO);
-                num1 = oDAO.orderedSuccess(userId, order, cDAO);
-                System.out.println("num1" + num1);
+                num1 = oDAO.orderedSuccess(userId, order, cDAO, voucher, transport);
+                System.out.println("numT1" + num1);
+                System.out.println("numT2" + oDAO.saveCartToDatabase(userId, cDAO));
                 request.setAttribute("messOrderSuccess", "Order success");
                 // Xóa giỏ hàng hoàn toàn
                 cDAO.clear(); // Xóa toàn bộ sản phẩm

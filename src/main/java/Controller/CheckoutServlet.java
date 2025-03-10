@@ -8,12 +8,14 @@ import DAO.CartDAO;
 import DAO.OrderDAO;
 import DAO.ProductDAO;
 import DAO.VoucherDAO;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.PrintWriter;
 import model.Cart;
 import model.Products;
 import model.User;
@@ -41,6 +43,7 @@ public class CheckoutServlet extends HttpServlet {
         String action = request.getParameter("action");
         String id = request.getParameter("id");
         String voucherId = request.getParameter("voucherId");
+        String transportId = request.getParameter("transportId");
         String dis = request.getParameter("dis");
         int userId = 0;
 
@@ -79,17 +82,21 @@ public class CheckoutServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID sản phẩm không hợp lệ");
             }
         }
-
+        if (transportId != null){
+             request.setAttribute("transportId", transportId);
+        }
         if (voucherId != null || dis != null) {
             int discount = Integer.parseInt(dis);
             request.setAttribute("applied", "applied");
             request.setAttribute("discount", discount);
+            request.setAttribute("voucherId", voucherId);
         }
         // Lấy danh sách order cũ và thêm vào giỏ hàng (chỉ khi chưa có)
         // Thiết lập thuộc tính cho checkout.jsp
         request.setAttribute("brand", pDAO.getAllBrand());
         request.setAttribute("type", pDAO.getAllType());
         request.setAttribute("vouchers", vDAO.getAllVoucher());
+        
         request.getRequestDispatcher("/WEB-INF/checkout.jsp").forward(request, response);
     }
 
@@ -104,12 +111,17 @@ public class CheckoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
         String id = request.getParameter("id");
         String num = request.getParameter("num");
         int userId = 0;
-        HttpSession session = request.getSession(false); // false để không tạo mới nếu không có      
+        HttpSession session = request.getSession(false);
         ProductDAO pDAO = new ProductDAO();
-        OrderDAO oDAO = new OrderDAO();
+
+        JsonObject jsonResponse = new JsonObject(); // JSON trả về
 
         if (session != null) {
             User user = (User) session.getAttribute("User");
@@ -117,22 +129,31 @@ public class CheckoutServlet extends HttpServlet {
                 userId = user.getUserId();
             }
         }
-        if (id != null && !id.isEmpty() && userId != 0) {  // Kiểm tra action và id
-            // Đảm bảo id không null và hợp lệ
+
+        if (id != null && !id.isEmpty() && userId != 0) {
             CartDAO cDAO = (CartDAO) session.getAttribute("SHOP");
-            if (cDAO == null) {  // Nếu cDAO chưa tồn tại trong session, khởi tạo mới
+            if (cDAO == null) {
                 cDAO = new CartDAO();
             }
-            Products p = pDAO.getProductById(Integer.parseInt(id));  // Lấy sản phẩm dựa trên id
-            if (p != null) {  // Kiểm tra xem sản phẩm có tồn tại không                     
+            Products p = pDAO.getProductById(Integer.parseInt(id));
+            if (p != null) {
                 String[] image = p.getImage() != null ? p.getImage().split(",") : new String[0];
-                p.setImage(image[0]);  // Lấy hình ảnh đầu tiên
+                p.setImage(image[0]);
                 Cart c = new Cart(p, Integer.parseInt(num));
-                cDAO.addToCart(c);  // Thêm sản phẩm vào giỏ hàng              
+                cDAO.addToCart(c);
             }
-            session.setAttribute("SHOP", cDAO);  // Lưu cDAO vào session         
+            session.setAttribute("SHOP", cDAO);
+
+            // Trả về JSON chứa tổng số sản phẩm trong giỏ
+            jsonResponse.addProperty("success", true);
+            jsonResponse.addProperty("numOrder", cDAO.size());
+        } else {
+            jsonResponse.addProperty("success", false);
+            jsonResponse.addProperty("message", "Invalid request");
         }
-        request.getRequestDispatcher("/WEB-INF/checkout.jsp").forward(request, response);
+
+        out.print(jsonResponse.toString());
+        out.flush();
     }
 
     /**

@@ -73,7 +73,7 @@ public class HomeServlet extends HttpServlet {
         if (!pDAO.getAll().isEmpty() && !pDAO.getTopSelled().isEmpty()) {
             // Gắn danh sách tất cả sản phẩm vào request với tên "products"
             request.setAttribute("products", pDAO.getAll());
-
+            System.out.println("product:"+ pDAO.getAll());
             request.setAttribute("numOrder", oDAO.getProductByUserId(userId).size());
             // Gắn danh sách sản phẩm bán chạy vào request với tên "topSelled"
             request.setAttribute("topSelled", pDAO.getTopSelled());
