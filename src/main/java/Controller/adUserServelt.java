@@ -5,6 +5,7 @@
 package Controller;
 
 import DAO.UserDAO;
+import com.google.gson.Gson;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -67,7 +68,7 @@ public class adUserServelt extends HttpServlet {
                 startPage = index - maxPagesToShow / 2;
                 endPageLimit = startPage + maxPagesToShow - 1;
             }
-            
+
             List<User> list = null;
             try {
                 list = uDAO.getPagingAd(index);
@@ -79,7 +80,7 @@ public class adUserServelt extends HttpServlet {
             request.setAttribute("startPage", startPage);
             request.setAttribute("endPageLimit", endPageLimit);
             request.setAttribute("currentPage", index);
-            
+
             request.getRequestDispatcher("/WEB-INF/adListUser.jsp").forward(request, response);
         }
 
@@ -94,14 +95,14 @@ public class adUserServelt extends HttpServlet {
             if ("edit".equals(action)) {
                 int id = Integer.parseInt(idParam);
                 User user = uDAO.getUserById(id);
-                request.setAttribute("user", user);
-                request.getRequestDispatcher("/WEB-INF/adEditUser.jsp").forward(request, response);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(new Gson().toJson(user));
             }
             if ("delete".equals(action)) {
                 int id = Integer.parseInt(idParam);
                 User user = uDAO.getUserById(id);
                 request.setAttribute("user", user);
-                System.out.println(user);
                 request.getRequestDispatcher("/WEB-INF/adDeleteUser.jsp").forward(request, response);
             }
         }
@@ -146,12 +147,9 @@ public class adUserServelt extends HttpServlet {
             } catch (SQLException ex) {
                 Logger.getLogger(adUserServelt.class.getName()).log(Level.SEVERE, null, ex);
             }
-
             request.setAttribute("user", user);
             response.sendRedirect("User?action=list");
-
         }
-
         if (action.equals("delete")) {
             uDAO.deleteUser(id);
             response.sendRedirect("User?action=list");

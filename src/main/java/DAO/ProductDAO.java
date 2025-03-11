@@ -779,15 +779,12 @@ public class ProductDAO extends DBContext {
 
     // Method to delete a product
     public int deleteProduct(int productId) {
-        String query = "UPDATE Orders\n"
-                + "SET Product_ID = NULL\n"
-                + "WHERE Product_ID = ?\n"
-                + "DELETE FROM Products\n"
-                + "WHERE Product_ID = ?";
-        Object[] params = {productId};
+        String updateQuery = "UPDATE Order_Details SET Product_ID = NULL WHERE Product_ID = ?";
+        String deleteQuery = "DELETE FROM Products WHERE Product_ID = ?";
 
         try {
-            return execQuery(query, params);
+            execQuery(updateQuery, new Object[]{productId});
+            return execQuery(deleteQuery, new Object[]{productId});
         } catch (SQLException ex) {
             return 0;
         }
@@ -800,8 +797,8 @@ public class ProductDAO extends DBContext {
             while (rs.next()) {
                 int total = rs.getInt(1);
                 int countPage = 0;
-                countPage = total / 12;
-                if (total % 12 != 0) {
+                countPage = total / 6;
+                if (total % 6 != 0) {
                     countPage++;
                 }
                 return countPage;
