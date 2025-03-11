@@ -104,7 +104,7 @@
                                 <th>Sold <span class="material-symbols-rounded">arrow_drop_down</span></th>
                                 <th>Stock <span class="material-symbols-rounded">arrow_drop_down</span></th>
                                 <th>Price <span class="material-symbols-rounded">arrow_drop_down</span></th>
-                                <th>Function <span class="material-symbols-rounded">arrow_drop_down</span></th>
+                                <th>Function</th>
                             </tr>
                         </thead>
                         <tbody>

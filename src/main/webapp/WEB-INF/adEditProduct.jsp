@@ -22,6 +22,7 @@
         <!-- CSS Link -->
         <link rel="stylesheet" href="./assets/css/Admin.css">
         <link rel="stylesheet" href="./assets/css/AdminStyle.css"/>
+        <link rel="stylesheet" href="./assets/css/adModal.css"/>
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

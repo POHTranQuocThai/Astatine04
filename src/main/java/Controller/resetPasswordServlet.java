@@ -12,6 +12,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.TokenForgetPassword;
 import model.User;
 import model.resetService;
@@ -76,48 +79,55 @@ public class resetPasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserDAO uDAO = new UserDAO();
-        ForgetTokenDAO tokenDAO = new ForgetTokenDAO();
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirm_password");
-        //validate password...
-        if (!password.equals(confirmPassword)) {
-            request.setAttribute("mess", "confirm password must same password");
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("WEB-INF/resetPassword.jsp").forward(request, response);
-            return;
-        }
-        HttpSession session = request.getSession();
-        String tokenStr = (String) session.getAttribute("token");
-        TokenForgetPassword tokenForgetPassword = tokenDAO.getTokenPassword(tokenStr);
-        //check token is valid, of time, of used
-        resetService service = new resetService();
-        if (tokenForgetPassword == null) {
-            request.setAttribute("mess", "token invalid");
-            request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
-            return;
-        }
-        if (tokenForgetPassword.isIsUsed()) {
-            request.setAttribute("mess", "token is used");
-            request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
-            return;
-        }
-        if (service.isExpireTime(tokenForgetPassword.getExpiryTime())) {
-            request.setAttribute("mess", "token is expiry time");
-            request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
-            return;
-        }
+        try {
+            UserDAO uDAO = new UserDAO();
+            ForgetTokenDAO tokenDAO = new ForgetTokenDAO();
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            String confirmPassword = request.getParameter("confirm_password");
+            //validate password...
+            if (!password.equals(confirmPassword)) {
+                request.setAttribute("mess", "confirm password must same password");
+                request.setAttribute("email", email);
+                request.getRequestDispatcher("WEB-INF/resetPassword.jsp").forward(request, response);
+                return;
+            }
+            HttpSession session = request.getSession();
+            String tokenStr = (String) session.getAttribute("token");
+            TokenForgetPassword tokenForgetPassword = tokenDAO.getTokenPassword(tokenStr);
+            //check token is valid, of time, of used
+            resetService service = new resetService();
+            if (tokenForgetPassword == null) {
+                request.setAttribute("mess", "token invalid");
+                request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
+                return;
+            }
+            if (tokenForgetPassword.isIsUsed()) {
+                request.setAttribute("mess", "token is used");
+                request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
+                return;
+            }
+            if (service.isExpireTime(tokenForgetPassword.getExpiryTime())) {
+                request.setAttribute("mess", "token is expiry time");
+                request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
+                return;
+            }
+                        
+            String hashedPassword = uDAO.getHashPass(password);
+            System.out.println("Hashed Password: " + hashedPassword);
 
-        //update is used of token
-        tokenForgetPassword.setToken(tokenStr);
-        tokenForgetPassword.setIsUsed(true);
-
-        uDAO.updatePassword(email, password);
-        tokenDAO.updateStatus(tokenForgetPassword);
-
-        //save user in session and redirect to home
-        request.getRequestDispatcher("WEB-INF/home.jsp").forward(request, response);
+            //update is used of token
+            tokenForgetPassword.setToken(tokenStr);
+            tokenForgetPassword.setIsUsed(true);
+            
+            uDAO.updatePassword(email, hashedPassword);
+            tokenDAO.updateStatus(tokenForgetPassword);
+            
+            //save user in session and redirect to home
+            request.getRequestDispatcher("WEB-INF/home.jsp").forward(request, response);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(resetPasswordServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

@@ -20,6 +20,7 @@
 
         <!-- CSS Link -->
         <link rel="stylesheet" href="./assets/css/Admin.css">
+        <link rel="stylesheet" href="./assets/css/adModal.css"/>
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -75,7 +76,7 @@
                 <h1 style="text-align: center; padding: 2rem 0 0 0;">Delete Product</h1>
                 <form action="Product?action=delete" method="post">
                     <input type="hidden" name="id" value="${product.productId}">
-                    <div>
+                    <div class="center-bottom">
                         <p style="font-size: 1.5rem;">Do you want to delete <span style="font-weight: 500; color: #21A691">${product.productName}</span>?</p>
                     </div>
 

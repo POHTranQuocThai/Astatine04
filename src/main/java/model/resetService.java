@@ -60,8 +60,35 @@ public class resetService {
             msg.setFrom(from);
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
             msg.setSubject("Reset Password", "UTF-8");
-            String content = "<h1>Hello" + name + "</h1>" + "<p>Click the link to reset password "
-                    + "<a href=" + link + ">Click here</a></p>";
+            String content = "<!DOCTYPE html>"
+                    + "<html lang='vi'>"
+                    + "<head>"
+                    + "<meta charset='UTF-8'>"
+                    + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                    + "<title>Đặt lại mật khẩu</title>"
+                    + "<style>"
+                    + "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }"
+                    + ".email-container { max-width: 500px; background: #fff; padding: 20px; margin: 30px auto; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }"
+                    + "h2 { color: #333; text-align: center; }"
+                    + "p { font-size: 16px; color: #555; text-align: center;}"
+                    + ".btn { display: block; background: #21A691; color: #fff !important; text-align: center; padding: 16px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; }"
+                    + ".btn:hover { background: #fff !important; color: #21A691 !important; border: 0.2px solid #21A691 !important}"
+                    + ".footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; }"
+                    + "</style>"
+                    + "</head>"
+                    + "<body>"
+                    + "<div class='email-container'>"
+                        + "<img src='https://drive.google.com/uc?export=view&id=1XICuRbb6ddxISheuuZZWPHpmbMMd0Y3M'/>"
+                    + "<h2>Hello, " + name + "!</h2>"
+                    + "<p>You have requested a password reset. Click the button below to do so:</p>"
+                    + "<a href='" + link + "' class='btn'>Reset your Password</a>"
+                    + "<div class='footer'>"
+                    + "<p>&copy; 2025 All rights reserved | This template is made with Astatine04.</p>"
+                    + "</div>"
+                    + "</div>"
+                    + "</body>"
+                    + "</html>";
+
             msg.setContent(content, "text/html; charset=UTF-8");
             Transport.send(msg);
             System.out.println("Send successfully");

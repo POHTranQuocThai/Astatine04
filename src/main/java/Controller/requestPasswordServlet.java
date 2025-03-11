@@ -56,6 +56,13 @@ public class requestPasswordServlet extends HttpServlet {
             request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
             return;
         }
+
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            request.setAttribute("mess", "Your account is logged in with Google, you cannot change your password this way.");
+            request.getRequestDispatcher("WEB-INF/requestPassword.jsp").forward(request, response);
+            return;
+        }
+        
         resetService service = new resetService();
         String token = service.generateToken();
 
