@@ -20,7 +20,7 @@ function showToast(message, type) {
     }).showToast();
 }
 
-function checkSubmitOrder(total) {
+function checkSubmitOrder(total,voucherId,transportId) {
     
     let payment1 = document.querySelector('#payment-1')
     let payment2 = document.querySelector('#payment-2')
@@ -42,7 +42,7 @@ function checkSubmitOrder(total) {
 
     confirmButton.onclick = function () {
         confirmModal.style.display = "none";
-        window.location.href = `Orders?total=${total}`;
+        window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}`;
         document.body.classList.remove("modal-open");
     };
 }

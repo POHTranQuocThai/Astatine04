@@ -62,6 +62,7 @@ public class CheckoutServlet extends HttpServlet {
             if (!oDAO.getProductByUserId(userId).isEmpty()) {
                 for (Products p : oDAO.getProductByUserId(userId)) {
                     if (p.getStatus().equals("Pending")) {
+                        System.out.println("p"+p.getStatus());
                         p.setCountInStock(p.getCountInStock() - p.getQuanOrder());
                         Cart c = new Cart(p, p.getQuanOrder());
                         cDAO.addToCart(c);

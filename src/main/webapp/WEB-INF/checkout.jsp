@@ -500,7 +500,7 @@ Author     : Tran Quoc Thai - CE181618
                                         </div>
 
                                     </div>                             
-                                    <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast})" class="primary-btn order-submit">Place order</a>
+                                    <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast},'${voucherId}','${transportId}')" class="primary-btn order-submit">Place order</a>
                                 <div class="modal" id="orderConfirmModal">
                                     <img src="../assets/img/Gif/groundhog-day.gif" alt="alt" style="width: 100px; height: 100px; margin: auto 0;"/>
                                     <div class="modal-header" style="border: none; margin: 0;">Are you sure?</div>

@@ -48,6 +48,7 @@ public class ProductDAO extends DBContext {
                 // Tạo đối tượng Products bằng dữ liệu từ từng cột và thêm vào danh sách
                 String imgData = rs.getString(9);
                 String[] image = (imgData != null) ? imgData.split(",") : new String[]{""};
+                //String[] image = rs.getString(9).split(",");
                 prod.add(new Products(
                         rs.getInt(1), // Cột ID
                         rs.getString(2), // Cột tên sản phẩm
@@ -456,7 +457,7 @@ public class ProductDAO extends DBContext {
             System.out.println("Params: offset=" + offset + ", itemsPerPage=" + itemsPerPage);
             try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String[] image = rs.getString(8).split(",");
+                    String[] image = rs.getString(9).split(",");
                     prod.add(new Products(
                             rs.getInt(1), // Product_ID
                             rs.getString(2), // Product_Name
@@ -464,9 +465,9 @@ public class ProductDAO extends DBContext {
                             rs.getInt(6), // Selled
                             rs.getDouble(7), // Price
                             image[0], // Image
-                            rs.getString(9), // Brand_Name
-                            rs.getString(10), // Category_Name
-                            rs.getString(11) // Description
+                            rs.getString(10), // Brand_Name
+                            rs.getString(11), // Category_Name
+                            rs.getString(12) // Description
                     ));
                 }
                 System.out.println("Result size: " + prod.size());

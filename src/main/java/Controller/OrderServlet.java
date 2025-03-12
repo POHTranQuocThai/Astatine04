@@ -40,16 +40,17 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String total = request.getParameter("total");
-        int voucher = 0;
-        int transport = 0;
-        voucher = Integer.parseInt(request.getParameter("voucher"));
-        transport = Integer.parseInt(request.getParameter("transport"));
+
         ProductDAO pDAO = new ProductDAO();
         OrderDAO oDAO = new OrderDAO();
         UserDAO uDAO = new UserDAO();
         int userId = 0;
         int num1 = 0;
+
+        String total = request.getParameter("total");
+
+        String voucherParam = request.getParameter("voucher");
+        String transportParam = request.getParameter("transport");
 
         HttpSession session = request.getSession(false); // false để không tạo mới nếu không có       
         User user = (User) session.getAttribute("User");
@@ -92,11 +93,11 @@ public class OrderServlet extends HttpServlet {
             }
 
             if (stockAvailable && cDAO != null) {
+
                 // Lưu giỏ hàng vào cơ sở dữ liệu và cập nhật thông tin đơn hàng
                 oDAO.saveCartToDatabase(userId, cDAO);
-                num1 = oDAO.orderedSuccess(userId, order, cDAO, voucher, transport);
+                num1 = oDAO.orderedSuccess(userId, order, cDAO, voucherParam, transportParam);
                 System.out.println("numT1" + num1);
-                System.out.println("numT2" + oDAO.saveCartToDatabase(userId, cDAO));
                 request.setAttribute("messOrderSuccess", "Order success");
                 // Xóa giỏ hàng hoàn toàn
                 cDAO.clear(); // Xóa toàn bộ sản phẩm
