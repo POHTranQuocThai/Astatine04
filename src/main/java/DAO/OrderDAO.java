@@ -10,8 +10,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Cart;
 import model.Order;
 import model.Products;
@@ -23,127 +27,87 @@ import model.User;
  */
 public class OrderDAO extends DBContext {
 
+    private int getPendingOrderId(int customerId) throws SQLException {
+        String sql = "SELECT TOP 1 Order_Id FROM Orders WHERE Customer_Id = ? AND Status = 'Pending' ORDER BY Order_Date DESC";
+        try ( ResultSet rs = execSelectQuery(sql, new Object[]{customerId})) {
+            return rs.next() ? rs.getInt("Order_Id") : -1; // Trả về -1 nếu không có đơn hàng
+        }
+
+    }
+
+//    private int getNextOrderDetailId() throws SQLException {
+//        String sql = "SELECT ISNULL(MAX(Order_Detail_Id), 0) + 1 FROM Order_Details";
+//        try ( ResultSet rs = execSelectQuery(sql)) {
+//            if (rs.next()) {
+//                return rs.getInt(1);
+//            }
+//        }
+//    }
     public int saveCartToDatabase(int customerId, CartDAO cDAO) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-
-        String getOrderIdSql = "SELECT MAX(Order_Id) FROM Orders";
-        String getOrderDetailIdSql = "SELECT MAX(Order_Detail_Id) FROM Order_Details";
-        String getExistingOrderSql = "SELECT Order_Id FROM Orders WHERE Customer_Id = ? AND Status = 'Pending'";
-
-        String insertOrderSql = "INSERT INTO Orders (Order_Id, Customer_Id, Email, Phone, Street, Ward, District, City, Country, "
-                + "Voucher_Id, Transport_Id, Order_Date, Total_Price, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)";
-
-        String insertOrderDetailSql = "INSERT INTO Order_Details (Order_Detail_Id, Product_Id, Order_Id, Quantity, Price) VALUES (?, ?, ?, ?, ?)";
-
-        String updateOrderDetailSql = "UPDATE Order_Details SET Quantity = ?, Price = ? WHERE Order_Id = ? AND Product_Id = ?";
-
-        int orderId = 0;
-        int nextOrderDetailId = 0;
-
-        Connection conn = null;
-
-        try {
-            conn = getConnection(); // Lấy một kết nối duy nhất
-            conn.setAutoCommit(false);  // Bắt đầu transaction
-
-            // Kiểm tra xem Order_Id đã tồn tại chưa
-            try ( PreparedStatement ps = conn.prepareStatement(getExistingOrderSql)) {
-                ps.setInt(1, customerId);
-                try ( ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        orderId = rs.getInt("Order_Id");
-                    }
-                }
+        String sqlNextId = "SELECT ISNULL(MAX(Order_Id), 0) + 1 as nextId FROM Orders";
+        String insertOrderSql = "INSERT INTO Orders (Order_Id, Customer_Id, Order_Date, Total_Price, Status) VALUES (?, ?, GETDATE(), 0, 'Pending')";
+        String insertOrderDetail = "INSERT INTO Order_Details (Order_Detail_Id, Product_Id, Order_Id, Quantity, Price) VALUES (?, ?,?,?, ?)";
+        String updateOrderDetail = "UPDATE od\n"
+                + "SET od.Quantity = ?, od.Price = ?\n"
+                + "FROM Order_Details od\n"
+                + "JOIN Orders o ON od.Order_ID = o.Order_ID\n"
+                + "WHERE od.Product_Id = ?\n"
+                + "AND od.Order_Id = ?\n"
+                + "AND o.Status = 'Pending';";
+        int nextId = 0;
+        nextId = getPendingOrderId(customerId);
+        int nextOrderDetail = 0;
+        String sqlNextDetailId = "SELECT ISNULL(MAX(Order_Detail_Id), 0) + 1 as nextDetailId FROM Order_Details";
+        try ( ResultSet rs = execSelectQuery(sqlNextDetailId)) {
+            if (rs.next()) {
+                nextOrderDetail = rs.getInt("nextDetailId");
             }
+        }
 
-            // Lấy Order_Detail_Id lớn nhất hiện tại
-            try ( PreparedStatement ps = conn.prepareStatement(getOrderDetailIdSql);  ResultSet rs = ps.executeQuery()) {
+        if (nextId == -1) {
+            try ( ResultSet rs = execSelectQuery(sqlNextId)) {
                 if (rs.next()) {
-                    nextOrderDetailId = rs.getInt(1) + 1;
-                } else {
-                    nextOrderDetailId = 1;
+                    nextId = rs.getInt("nextId");
                 }
             }
+            execQuery(insertOrderSql, new Object[]{
+                nextId,
+                customerId
+            });
 
-            // Nếu chưa có Order, tạo mới
-            if (orderId == 0) {
-                try ( PreparedStatement ps = conn.prepareStatement(getOrderIdSql);  ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        orderId = rs.getInt(1) + 1;
-                    } else {
-                        orderId = 1;
-                    }
-                }
-
-                try ( PreparedStatement ps = conn.prepareStatement(insertOrderSql)) {
-                    ps.setInt(1, orderId);
-                    ps.setInt(2, customerId);
-                    for (int i = 3; i <= 9; i++) {
-                        ps.setString(i, ""); // Điền các cột rỗng
-                    }
-                    ps.setTimestamp(10, new java.sql.Timestamp(System.currentTimeMillis()));
-                    ps.setDouble(11, 0);
-                    ps.setString(12, "Pending");
-                    rowsAffected += ps.executeUpdate();
-                }
-            }
-
-            // Duyệt qua giỏ hàng để cập nhật Order_Details
             for (Order order : cDAO.getProductsInCart(customerId)) {
                 Products prod = pDAO.getProductById(order.getProductId());
+                Object[] insertOrderDetailParam = {
+                    nextOrderDetail++, // Order_Detail_Id, tăng nextId cho mỗi sản phẩm mới   
+                    order.getProductId(), // Product_ID
+                    nextId,
+                    order.getAmount(), // Amount           
+                    order.getAmount() * prod.getPrice()// TotalPrice
+                };
+                rowsAffected += execQuery(insertOrderDetail, insertOrderDetailParam);
+            }
+        } else {
 
-                // Kiểm tra xem sản phẩm đã tồn tại trong Order_Details chưa
-                boolean exists = false;
-                String checkExistSql = "SELECT COUNT(*) FROM Order_Details WHERE Order_Id = ? AND Product_Id = ?";
-                try ( PreparedStatement ps = conn.prepareStatement(checkExistSql)) {
-                    ps.setInt(1, orderId);
-                    ps.setInt(2, order.getProductId());
-                    try ( ResultSet rs = ps.executeQuery()) {
-                        if (rs.next() && rs.getInt(1) > 0) {
-                            exists = true;
-                        }
-                    }
-                }
+            for (Order order : cDAO.getProductsInCart(customerId)) {
+                // Cập nhật nếu sản phẩm đã tồn tại
+                Products prod = pDAO.getProductById(order.getProductId());
 
-                if (exists) {
-                    // Nếu sản phẩm đã có trong Order_Details, cập nhật số lượng
-                    try ( PreparedStatement ps = conn.prepareStatement(updateOrderDetailSql)) {
-                        ps.setInt(1, order.getAmount());
-                        ps.setDouble(2, order.getAmount() * prod.getPrice());
-                        ps.setInt(3, orderId);
-                        ps.setInt(4, order.getProductId());
-                        rowsAffected += ps.executeUpdate();
-                    }
+                Object[] updateParams = {order.getAmount(), order.getAmount() * prod.getPrice(), order.getProductId(), nextId};
+                int updatedRows = execQuery(updateOrderDetail, updateParams);
+
+                if (updatedRows == 0) { // Nếu không có dòng nào được cập nhật, thêm mới sản phẩm
+                    Object[] insertParams = {
+                        nextOrderDetail++, // Order_Detail_Id, tăng nextId cho mỗi sản phẩm mới   
+                        order.getProductId(), // Product_ID
+                        nextId,
+                        order.getAmount(), // Amount           
+                        order.getAmount() * prod.getPrice()// TotalPrice
+                    };
+                    rowsAffected += execQuery(insertOrderDetail, insertParams);
                 } else {
-                    // Nếu chưa có, thêm mới vào Order_Details
-                    try ( PreparedStatement ps = conn.prepareStatement(insertOrderDetailSql)) {
-                        ps.setInt(1, nextOrderDetailId);
-                        ps.setInt(2, order.getProductId());
-                        ps.setInt(3, orderId);
-                        ps.setInt(4, order.getAmount());
-                        ps.setDouble(5, order.getAmount() * prod.getPrice());
-                        rowsAffected += ps.executeUpdate();
-                        nextOrderDetailId++;
-                    }
-                }
-            }
-
-            conn.commit(); // Xác nhận transaction
-        } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); // Nếu có lỗi, rollback transaction
-            }
-            e.printStackTrace();
-            return 0;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close(); // Đóng kết nối sau khi xong
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    rowsAffected += updatedRows;
                 }
             }
         }
@@ -151,40 +115,25 @@ public class OrderDAO extends DBContext {
         return rowsAffected;
     }
 
-    public int orderedSuccess(int userId, Order order, CartDAO cDAO, int voucher, int transport) throws SQLException {
+    public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-
-        // Lấy Order_ID lớn nhất hiện có (giả sử mỗi đơn hàng chỉ có một mã duy nhất)
-        String sqlOrderId = "SELECT Order_Id FROM Orders WHERE Customer_ID = ? AND status = 'Pending'";
-        List<Integer> pendingOrderIds = new ArrayList<>();
-        try ( ResultSet rs = execSelectQuery(sqlOrderId, new Object[]{userId})) {
-            while (rs.next()) { // 🛠 SỬA LỖI: Lấy tất cả Order_ID, không chỉ lấy 1 cái
-                pendingOrderIds.add(rs.getInt(1));
-            }
-        }
-
-        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?, Phone = ?,Voucher_Id = ?,Transport_Id = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Order_Id = ?";
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Customer_Id = ?";
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
-       
-        for (int orderId : pendingOrderIds) {
-            Object[] orderParams = {
-                order.getStreet(),
-                order.getWard(),
-                order.getDistrict(),
-                order.getCity(),
-                order.getCountry(),
-                order.getPhone(),
-                voucher ,
-                transport ,
-                order.getStatus(),
-                order.getTotalPrice(),
-                order.getEmail(),
-                orderId
-            };
-            rowsAffected += execQuery(sql, orderParams);
-            System.out.println("row" + rowsAffected);
-        }
+        Object[] params = {
+            order.getStreet(),
+            order.getWard(),
+            order.getDistrict(),
+            order.getCity(),
+            order.getCountry(),
+            voucher != "" ? Integer.parseInt(voucher) : null,
+            transport != "" ? Integer.parseInt(transport) : null,
+            order.getPhone(),
+            "Ordered",
+            order.getTotalPrice(),
+            order.getEmail(),
+            userId
+        };
         try {
             for (Order cartOrder : cDAO.getProductsInCart(userId)) {
                 Products prod = pDAO.getProductById(cartOrder.getProductId());
@@ -199,31 +148,46 @@ public class OrderDAO extends DBContext {
                         rowsAffected += affectedRows;
                     } else {
                         System.out.println("Insufficient stock for Product_ID: " + cartOrder.getProductId());
-                        return 0; // Không tiếp tục nếu hết hàng
                     }
+
                 } else {
                     System.out.println("Product not found for ID: " + cartOrder.getProductId());
                 }
             }
 
             // Thực thi câu lệnh UPDATE cho Orders
+            rowsAffected += execQuery(sql, params);
         } catch (SQLException e) {
             e.printStackTrace(); // In ra lỗi nếu có
         }
-
         return rowsAffected;
+    }
+
+    private void deleteEmptyPendingOrders(int userId) throws SQLException {
+        String deleteSql = "DELETE FROM Orders WHERE Order_Id IN "
+                + "(SELECT o.Order_Id FROM Orders o LEFT JOIN Order_Details od "
+                + "ON o.Order_Id = od.Order_Id WHERE o.Customer_Id = ? AND o.Status = 'Pending' "
+                + "GROUP BY o.Order_Id HAVING COUNT(od.Order_Detail_Id) = 0)";
+
+        try ( Connection conn = getConnection();  PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+            ps.setInt(1, userId);
+            int deletedRows = ps.executeUpdate();
+            if (deletedRows > 0) {
+                System.out.println("🗑 Xoá " + deletedRows + " đơn hàng Pending trống.");
+            }
+        }
     }
 
     public ArrayList<Products> getProductByUserId(int userId) {
         ArrayList<Products> prod = new ArrayList<>();
         String sql = "SELECT p.*, cat.Category_Name ,b.Brand_Name, o.Quantity, os.Status\n"
                 + "FROM Products p\n"
-                + "JOIN Brands b ON p.Brand_Id = b.Brand_ID\n"
-                + "JOIN Order_Details o ON o.Product_ID = p.Product_ID\n"
-                + "JOIN Orders os ON os.Order_Id = o.Order_Id\n"
-                + "JOIN Customers c ON c.Customer_ID = os.Customer_Id\n"
-                + "JOIN Categories cat ON p.Category_Id = cat.Category_Id\n"
-                + "WHERE c.Customer_ID = ?";
+                + "				JOIN Brands b ON p.Brand_Id = b.Brand_ID\n"
+                + "				JOIN Order_Details o ON o.Product_ID = p.Product_ID\n"
+                + "				JOIN Orders os ON os.Order_Id = o.Order_Id\n"
+                + "				JOIN Customers c ON c.Customer_ID = os.Customer_Id\n"
+                + "				JOIN Categories cat ON p.Category_Id = cat.Category_Id\n"
+                + "				WHERE c.Customer_ID = ? and os.Status = 'Pending'";
         Object[] params = {userId};
 
         try ( ResultSet rs = execSelectQuery(sql, params)) {
