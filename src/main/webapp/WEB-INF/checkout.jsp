@@ -4,6 +4,7 @@ Created on : Oct 14, 2024, 8:11:49 PM
 Author     : Tran Quoc Thai - CE181618 
 --%>
 
+<%@page import="java.time.LocalDate"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -327,22 +328,40 @@ Author     : Tran Quoc Thai - CE181618
                                     <c:if test="${not empty discount}">${applied}</c:if>
                                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                             <div class="coupon-dropdown-content"> 
+                                            <%-- Lấy ngày hiện tại trong JSP --%>
+                                            <c:set var="today" value="<%= LocalDate.now().toString()%>" />
                                             <c:forEach items="${vouchers}" var="voucher">
-                                                <div class="coupon">
+                                                <c:set var="isExpired" value="${voucher.expiry < today}" />
+
+                                                <div class="coupon ${isExpired ? 'disabled' : ''}">
                                                     <div class="coupon-left">
                                                         <img alt="Astatine logo" height="40" src="assets/img/logo.png" width="40" />
                                                     </div>
                                                     <div class="coupon-mid">
-                                                        <div style="font-weight: 600;color: #00a089;"><span>Get ${voucher.discount}% off your total bill</span></div>
-                                                        <div style="font-size: 13px; color: gray"> Expired: ${voucher.expiry}</div>
-                                                    </div>
-                                                    <div class="coupon-right">
-                                                        <div class="expired" style="background: #00a089 ;padding: 6px;border-radius: 5px; color: white;">
-                                                            <a href="Checkout?voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
+                                                        <div style="font-weight: 600;color: #00a089;">
+                                                            <span>Get ${voucher.discount}% off your total bill</span>
+                                                        </div>
+                                                        <div style="font-size: 13px; color: gray">
+                                                            Expired: ${voucher.expiry}
                                                         </div>
                                                     </div>
+                                                    <div class="coupon-right">
+                                                        <c:choose>
+                                                            <c:when test="${isExpired}">
+                                                                <div class="expired" style="background: gray; padding: 6px; border-radius: 5px; color: white;">
+                                                                    Expired
+                                                                </div>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div class="expired" style="background: #00a089; padding: 6px; border-radius: 5px; color: white;">
+                                                                    <a href="Checkout?voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
+                                                                </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
                                                 </div>
-                                            </c:forEach>                              
+                                            </c:forEach> <!-- Đảm bảo có thẻ đóng này -->
+
                                         </div>
                                     </div>
                                 </div>
@@ -500,7 +519,7 @@ Author     : Tran Quoc Thai - CE181618
                                         </div>
 
                                     </div>                             
-                                    <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast},'${voucherId}','${transportId}')" class="primary-btn order-submit">Place order</a>
+                                    <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast}, '${voucherId}', '${transportId}')" class="primary-btn order-submit">Place order</a>
                                 <div class="modal" id="orderConfirmModal">
                                     <img src="../assets/img/Gif/groundhog-day.gif" alt="alt" style="width: 100px; height: 100px; margin: auto 0;"/>
                                     <div class="modal-header" style="border: none; margin: 0;">Are you sure?</div>
