@@ -48,6 +48,7 @@ public class OrderServlet extends HttpServlet {
         int num1 = 0;
 
         String total = request.getParameter("total");
+        System.out.println(total);
 
         String voucherParam = request.getParameter("voucher");
         String transportParam = request.getParameter("transport");

@@ -5,6 +5,8 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:formatNumber value="${order.totalPrice}" type="number" groupingUsed="true"/>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,7 +23,7 @@
 
         <!-- CSS Link -->
         <link rel="stylesheet" href="./assets/css/Admin.css">
-        <link rel="stylesheet" href="./assets/css/adOrder.css"/>
+        <link rel="stylesheet" href="assets/css/adOrder.css"/>
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -70,7 +72,7 @@
         <!-- Admin User -->   
         <main class="table">
             <section class="table_header">
-                <h1>User Management.</h1>
+                <h1>Order Management.</h1>
                 <div class="input-group">
                     <input type="search" id="search" placeholder="Search">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M380-320q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
@@ -86,7 +88,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID<span class="material-symbols-rounded">arrow_drop_down</span></th>
+                            <th>#<span class="material-symbols-rounded">arrow_drop_down</span></th>
                             <th>Customer Name<span class="material-symbols-rounded">arrow_drop_down</span></th>
                             <th>Order ID <span class="material-symbols-rounded">arrow_drop_down</span></th>
                             <th>Order Date<span class="material-symbols-rounded">arrow_drop_down</span></th>
@@ -96,22 +98,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${orderList}" var="order">
+                        <c:forEach items="${orderList}" var="order" varStatus="status">
                             <tr>
-                                <td>${order.orderId}</td>
+                                <td>${status.index + 1}</td> 
                                 <td>${order.customerName}</td>
-                                <td>${order.productName}</td>
+                                <td>${order.orderId}</td>
                                 <td>${order.orderDate}</td>
-                                <td>$${order.totalPrice}</td>
-                                <td><p class="status ${order.status == 'Processing' ? 'Processing' : 'Completed'}">${order.status}</p></td>
+                                <td><fmt:formatNumber value="${order.totalPrice}" pattern="#,###" /> VNĐ</td>
                                 <td>
-                                    <!-- Edit Icon -->
-                                    <a href='Order?action=edit&id=${order.orderId}' class="table-btn" style="text-decoration: none;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
-                                        <path d="M200-200h57l391-391-57-57-391 391v57Zm-40 80q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm600-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
-                                        </svg>
-                                    </a>
+                                    <select class="status-select ${order.status == 'Delivered' ? 'delivered' : ''} ${order.status == 'Canceled' ? 'canceled' : ''}" 
+                                            data-order-id="${order.orderId}"
+                                            ${order.status != 'Ordered' ? 'disabled' : ''}>
+                                        <option value="Ordered" ${order.status == 'Ordered' ? 'selected' : ''}>Ordered</option>
+                                        <option value="Delivered" ${order.status == 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                        <option value="Canceled" ${order.status == 'Canceled' ? 'selected' : ''}>Canceled</option>
+                                    </select>
+                                </td>
 
+                                <td>
                                     <!-- Delete Icon -->
                                     <a href='Order?action=delete&id=${order.orderId}' class="table-btn" style="text-decoration: none;">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
@@ -130,4 +134,5 @@
     <!-- JS Link-->
     <script type="text/javascript" src="./assets/js/JSRemake/adminTable.js"></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminJS.js"></script>
+    <script type="text/javascript" src="../assets/js/Admin/selectStatus.js"></script>
 </html>

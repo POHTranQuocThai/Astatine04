@@ -8,16 +8,15 @@ import DAO.OrderDAO;
 import DAO.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-import java.io.File;
-import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Order;
 import model.User;
 
@@ -25,12 +24,6 @@ import model.User;
  *
  * @author Ma Tan Loc - CE181795
  */
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10, // 10MB
-        maxRequestSize = 1024 * 1024 * 50 // 50MB
-)
-
 public class ProfileServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -70,7 +63,7 @@ public class ProfileServlet extends HttpServlet {
                 // Optionally, handle the case where the user is not found
             }
         } else {
-            response.sendRedirect("WEB-INF/login.jsp"); // Redirect to login if email is not present
+            response.sendRedirect("Login");
         }
     }
 
@@ -86,78 +79,93 @@ public class ProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         UserDAO uDao = new UserDAO();
-
-        String pass = request.getParameter("password");
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
 
-        if (action.equals("password")) {
+        if ("password".equals(action)) {
+            String oldPassword = request.getParameter("old_password");
             String password = request.getParameter("password");
-        }
+            String confirmPassword = request.getParameter("confirm_password");
 
-        String fullname = request.getParameter("fullname"); 
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String street = request.getParameter("street");
-        String ward = request.getParameter("ward");
-        String district = request.getParameter("district");
-        String city = request.getParameter("city");
-        String country = request.getParameter("country");
-
-        // Lấy đường dẫn của dự án và lưu vào trong img/product/
-        String applicationPath = getServletContext().getRealPath("");
-        String uploadPath = applicationPath.replace("build\\", "") + "assets\\img\\user";
-
-        System.out.println("IMG: " + uploadPath);
-
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs(); // Tạo thư mục nếu chưa tồn tại
-        }
-
-        // Xử lý nhiều ảnh và nối đường dẫn bằng dấu phẩy
-        StringBuilder imagePaths = new StringBuilder();
-        for (Part filePart : request.getParts()) {
-            if (filePart.getName().equals("avatar") && filePart.getSize() > 0) { // Kiểm tra part là hình ảnh
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // Lấy tên file
-                filePart.write(uploadPath + File.separator + fileName); // Tiến hành lưu file
-
-                if (imagePaths.length() > 0) {
-                    imagePaths.append(","); // Thêm dấu phẩy nếu đã có ảnh trước đó
-                }
-                imagePaths.append("assets\\img\\product\\").append(fileName); // Lưu đường dẫn ảnh
+            if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
+                request.setAttribute("mess", "Password không được để trống.");
+                request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+                return;
             }
-        }
 
-        if (email != null) {
+            if (!password.equals(confirmPassword)) {
+                request.setAttribute("mess", "Confirm password phải giống với password.");
+                request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+                return;
+            }
+
+            User user = uDao.getUserByEmail(email);
+            if (user == null) {
+                request.setAttribute("mess", "Không tìm thấy tài khoản.");
+                request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+                return;
+            }
+
             try {
-                User user = uDao.getUserByEmail(email);
-                if (user != null) {
-                    user.setFullname(fullname);
-                    user.setStreet(street);
-                    user.setWard(ward);
-                    user.setDistrict(district);
-                    user.setCity(city);
-                    user.setCountry(country);
-                    user.setPhone(phone);
-
-                    int result = uDao.updateUser(user);
-                    if (result > 0) {
-                        // Successful update; redirect to the profile servlet to refresh the data
-                        response.sendRedirect("Profile?action=edit"); // Redirect to GET method
-                    } else {
-                        // Update failed; set an error message in the session or request
-                        request.setAttribute("message", "Failed to update profile.");
-                        // Optionally, forward back to the profile.jsp to display the error message
-                        request.setAttribute("user", user); // Pass the updated user back
-                        request.getRequestDispatcher("/WEB-INF/profile.jsp").forward(request, response);
-                    }
+                String hashedOldPass = uDao.getHashPass(oldPassword);
+                if (!user.getPassword().equals(hashedOldPass)) {
+                    request.setAttribute("mess", "Mật khẩu cũ không đúng.");
+                    request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+                    return;
                 }
-            } catch (SQLException e) {
-                response.sendRedirect("error.jsp");
+            } catch (NoSuchAlgorithmException e) {
             }
-        } else {
-            response.sendRedirect("Login");
+
+            try {
+                String hashedPassword = uDao.getHashPass(password); // Hash mật khẩu mới
+                user.setPassword(hashedPassword);
+                uDao.updatePassword(email, hashedPassword); // Cập nhật mật khẩu đã hash
+                request.setAttribute("mess", "Cập nhật mật khẩu thành công.");
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(ProfileServlet.class.getName()).log(Level.SEVERE, null, ex);
+                request.setAttribute("mess", "Đã xảy ra lỗi trong quá trình cập nhật mật khẩu.");
+            }
+
+            request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+
+        } else if ("edit".equals(action)) {
+            String fullname = request.getParameter("fullname");
+            String phone = request.getParameter("phone");
+            String street = request.getParameter("street");
+            String ward = request.getParameter("ward");
+            String district = request.getParameter("district");
+            String city = request.getParameter("city");
+            String country = request.getParameter("country");
+
+            if (email != null) {
+                try {
+                    User user = uDao.getUserByEmail(email);
+                    if (user != null) {
+                        user.setFullname(fullname);
+                        user.setStreet(street);
+                        user.setWard(ward);
+                        user.setDistrict(district);
+                        user.setCity(city);
+                        user.setCountry(country);
+                        user.setPhone(phone);
+
+                        int result = uDao.updateUser(user);
+                        if (result > 0) {
+                            response.sendRedirect("Profile?action=edit");
+                        } else {
+                            request.setAttribute("message", "Failed to update profile.");
+                            request.setAttribute("user", user); // Pass the updated user back
+                            request.getRequestDispatcher("/WEB-INF/profile.jsp").forward(request, response);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    response.sendRedirect("error.jsp");
+                }
+            } else {
+                response.sendRedirect("Login");
+            }
         }
     }
 

@@ -16,11 +16,11 @@ import model.Voucher;
  */
 public class VoucherDAO extends DBContext {
 
-    public ArrayList<Voucher> getAllVoucher() {
+     public ArrayList<Voucher> getAllVoucher() {
         ArrayList<Voucher> voucher = new ArrayList<>();
 
         // Câu truy vấn SQL để chọn tất cả các cột từ bảng 'products'
-        String query = "select * from Voucher";
+        String query = "select * from Vouchers";
 
         // Thực thi truy vấn và lấy kết quả trả về
         try ( ResultSet rs = execSelectQuery(query)) {
