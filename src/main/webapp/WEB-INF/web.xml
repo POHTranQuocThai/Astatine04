@@ -108,6 +108,14 @@
         <servlet-name>deleteCommentServlet</servlet-name>
         <servlet-class>Controller.deleteCommentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>OrderDataServlet</servlet-name>
+        <servlet-class>Controller.OrderDataServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>adDashboardServlet</servlet-name>
+        <servlet-class>Controller.adDashboardServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>adListServlet</servlet-name>
         <url-pattern>/List</url-pattern>
@@ -218,6 +226,14 @@
     <servlet-mapping>
         <servlet-name>deleteCommentServlet</servlet-name>
         <url-pattern>/deleteComment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderDataServlet</servlet-name>
+        <url-pattern>/OrderData</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adDashboardServlet</servlet-name>
+        <url-pattern>/adDashboard</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

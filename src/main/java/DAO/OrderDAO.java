@@ -347,7 +347,7 @@ public class OrderDAO extends DBContext {
             }
         } catch (SQLException e) {
             // Handle SQL exception appropriately
-            
+
         }
         return orderList; // Return the list of orders
     }
@@ -372,6 +372,26 @@ public class OrderDAO extends DBContext {
             }
         }
         return orderItems;
+    }
+
+    public ArrayList<Order> getAllDataOrders() {
+        ArrayList<Order> orders = new ArrayList<>();
+        String query = "SELECT od.Quantity,o.Order_Date, o.Status FROM Orders o\n"
+                + "JOIN Order_Details od ON o.Order_Id = od.Order_Id\n"
+                + "Where o.Status = 'Delivered'";
+
+        try ( ResultSet rs = execSelectQuery(query)) {
+            while (rs != null && rs.next()) {
+                orders.add(new Order(
+                        rs.getInt("Quantity"),
+                        rs.getDate("Order_Date"),
+                        rs.getString("Status")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
     }
 
 }
