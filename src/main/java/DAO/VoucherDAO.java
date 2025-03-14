@@ -20,7 +20,7 @@ public class VoucherDAO extends DBContext {
         ArrayList<Voucher> voucher = new ArrayList<>();
 
         // Câu truy vấn SQL để chọn tất cả các cột từ bảng 'products'
-        String query = "select * from Voucher";
+        String query = "select * from Vouchers";
 
         // Thực thi truy vấn và lấy kết quả trả về
         try ( ResultSet rs = execSelectQuery(query)) {
@@ -30,7 +30,7 @@ public class VoucherDAO extends DBContext {
                         rs.getInt(1), // Cột ID
                         rs.getString(2), // Cột tên sản phẩm
                         rs.getInt(3),
-                        rs.getString(4)
+                        rs.getDate(4).toLocalDate()
                 ));
             }
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class VoucherDAO extends DBContext {
                         rs.getInt("Voucher_ID"),
                         rs.getString("Voucher_Name"),
                         rs.getInt("Discount"),
-                        rs.getString("Expiry")
+                        rs.getDate(4).toLocalDate()
                 );
             }
         } catch (Exception e) {
@@ -94,11 +94,13 @@ public class VoucherDAO extends DBContext {
         String query = "DELETE FROM Voucher WHERE Voucher_ID = ?";
         Object[] params = {voucherId};
         try {
-           return execQuery(query, params);
+            return execQuery(query, params);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
 
+
 }
+        
