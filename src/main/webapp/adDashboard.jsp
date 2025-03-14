@@ -6,6 +6,9 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%
+    String jsonProduct = (String) request.getAttribute("jsonProduct");
+%>
 
 
 <!DOCTYPE HTML>
@@ -30,45 +33,100 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_drop_down" />
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        
-        <script type="text/javascript">
+
+        <script>
             window.onload = function () {
-
                 var dataPoints = [];
+                var dataPointsProduct = [];
+                let currentMonth = new Date().getMonth() + 1;
 
-                var chart = new CanvasJS.Chart("chartContainer", {
+                // Chart 1: Tổng số lượng sản phẩm bán ra trong tháng
+                var chart1 = new CanvasJS.Chart("chartContainer1", {
                     animationEnabled: true,
                     theme: "light2",
-                    zoomEnabled: true,
+                    exportFileName: "Top Selling Products",
+                    exportEnabled: true,
                     title: {
-                        text: "Total Biomass Energy Consumption"
+                        text: `Total Quantity Sold in Month ${currentMonth}`
                     },
                     axisY: {
-                        title: "Biomass Consumption (in Trillion BTU)",
-                        titleFontSize: 24
+                        title: "Quantity"
+                    },
+                    axisX: {
+                        title: "Order Date",
                     },
                     data: [{
-                            type: "line",
-                            yValueFormatString: "#,##0.0## Trillion BTU",
-                            xValueType: "dateTime",
+                            type: "spline",
                             dataPoints: dataPoints
                         }]
                 });
+                var chart2 = new CanvasJS.Chart("chartContainer2", {
+                    theme: "light2",
+                    animationEnabled: true,
+                    exportFileName: "Top Selling Products",
+                    exportEnabled: true,
+                    title: {
+                        text: "Top Selling Products"
+                    },
+                    data: [{
+                            type: "pie",
+                            showInLegend: true,
+                            legendText: "{label}",
+                            toolTipContent: "{label}: <strong>{y}%</strong> units",
+                            indexLabel: "{label} {y}%",
+                            dataPoints: dataPointsProduct
+                        }]
+                });
+                function loadData() {
+                    fetch("OrderData")
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
 
-                function addData(data) {
-                    for (var i = 0; i < data.length; i++) {
-                        dataPoints.push({
-                            x: data[i].timestamp,
-                            y: data[i].value
-                        });
-                    }
-                    chart.render();
+                                data.orders.forEach(item => {
+                                    let orderDate = new Date(item.timestamp);
+                                    let orderMonth = orderDate.getMonth() + 1;
+
+                                    if (orderMonth === currentMonth) {
+                                        dataPoints.push({
+                                            x: orderDate.getDate(),
+                                            y: item.amount
+                                        });
+                                    }
+                                });
+
+                                let total = 0;
+                                let totalPercent = 0;
+                                data.products.forEach(item => {
+                                    total += item.y;
+                                });
+                                data.products.forEach((item, index) => {
+                                    let percent = ((item.y / total) * 100).toFixed(2);
+                                    percent = parseFloat(percent); 
+
+                                    totalPercent += percent;
+
+                                    if (index === data.products.length - 1 && totalPercent !== 100) {
+                                        percent += 100 - totalPercent;
+                                    }
+
+                                    dataPointsProduct.push({
+                                        label: item.label,
+                                        y: percent
+                                    });
+                                });
+                                console.log(dataPointsProduct);
+                                chart1.options.axisX.interval = 1;
+                                chart1.render();
+                                chart2.render();
+                            })
+                            .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
                 }
 
-                $.getJSON("https://canvasjs.com/data/gallery/jsp/total-biomass-energy-consumption.json", addData);
-
-            }
+                loadData();
+            };
         </script>
+
     </head>
     <body>
         <nav id="sidebar">
@@ -81,13 +139,19 @@
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="m382-480 294 294q15 15 14.5 35T675-116q-15 15-35 15t-35-15L297-423q-12-12-18-27t-6-30q0-15 6-30t18-27l308-308q15-15 35.5-14.5T676-844q15 15 15 35t-15 35L382-480Z" /></svg>
                     </button>
                 </li>
+                <li class="active">
+                    <a href="Dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
                 <li>
                     <a href="User">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg>
                         <span>User</span>
                     </a>
                 </li>
-                <li class="active">
+                <li>
                     <a href="Product">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M400-200q-17 0-28.5-11.5T360-240q0-17 11.5-28.5T400-280h400q17 0 28.5 11.5T840-240q0 17-11.5 28.5T800-200H400Zm0-240q-17 0-28.5-11.5T360-480q0-17 11.5-28.5T400-520h400q17 0 28.5 11.5T840-480q0 17-11.5 28.5T800-440H400Zm0-240q-17 0-28.5-11.5T360-720q0-17 11.5-28.5T400-760h400q17 0 28.5 11.5T840-720q0 17-11.5 28.5T800-680H400ZM200-160q-33 0-56.5-23.5T120-240q0-33 23.5-56.5T200-320q33 0 56.5 23.5T280-240q0 33-23.5 56.5T200-160Zm0-240q-33 0-56.5-23.5T120-480q0-33 23.5-56.5T200-560q33 0 56.5 23.5T280-480q0 33-23.5 56.5T200-400Zm0-240q-33 0-56.5-23.5T120-720q0-33 23.5-56.5T200-800q33 0 56.5 23.5T280-720q0 33-23.5 56.5T200-640Z" /></svg>
                         <span>Products</span>
@@ -111,7 +175,7 @@
         <!-- Admin Products -->
         <main class="table">
             <section class="table_header">
-                <h1>Product Management.</h1>
+                <h1>Dashboard.</h1>
                 <div class="input-group">
                     <input type="search" id="search" placeholder="Search" >
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M380-320q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
@@ -123,7 +187,10 @@
                     </div>                    
                 </div>
             </section>
-            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+            <div id="chartContainer1" style="height: 370px; width: 100%;"></div>
+            <div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+
+
         </main>
         <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
         <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
