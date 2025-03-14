@@ -118,7 +118,7 @@ public class OrderDAO extends DBContext {
     public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Customer_Id = ?";
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Customer_Id = ? AND Status = 'Pending'";
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
         Object[] params = {
             order.getStreet(),
@@ -259,8 +259,7 @@ public class OrderDAO extends DBContext {
         Object[] params = {orderId};
         try {
             return execQuery(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
         }
         return 0;
     }
@@ -268,24 +267,23 @@ public class OrderDAO extends DBContext {
     //get Order Table
     public ArrayList<Order> getAllOrders() {
         ArrayList<Order> orders = new ArrayList<>();
-        String query = "SELECT o.Order_ID, p.Product_Name, c.Customer_Name, o.City,o.Email, o.Phone, o.Amount, o.Order_Date, o.Status, o.TotalPrice FROM Orders o \n"
-                + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
-                + "JOIN Products p ON o.Product_ID = p.Product_ID \n"
-                + "WHERE o.Status = 'Processing';";
+        String query = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+                + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n";
 
         try ( ResultSet rs = execSelectQuery(query)) {
             while (rs != null && rs.next()) {
                 orders.add(new Order(
                         rs.getInt("Order_ID"),
-                        rs.getString("Product_Name"),
                         rs.getString("Customer_Name"),
+                        rs.getDouble("Total_Price"),
+                        rs.getString("Street"),
+                        rs.getString("Ward"),
+                        rs.getString("District"),
                         rs.getString("City"),
                         rs.getString("Email"),
                         rs.getString("Phone"),
-                        rs.getInt("Amount"),
                         rs.getDate("Order_Date"),
-                        rs.getString("Status"),
-                        rs.getDouble("TotalPrice")
+                        rs.getString("Status")
                 ));
             }
         } catch (SQLException e) {
@@ -296,64 +294,84 @@ public class OrderDAO extends DBContext {
 
     //Admin
     public Order getOrderByOrderId(int orderId) {
-        String sql = "SELECT o.Order_ID, c.Customer_Name, p.Product_Name, o.Street, o.Ward, o.District, o.City, o.Country, o.Email, o.Phone, o.Order_Date, o.Status\n"
-                + "FROM Orders o\n"
-                + "JOIN Customers c ON o.Customer_ID = c.Customer_ID\n"
-                + "JOIN Products p ON o.Product_ID = p.Product_ID\n"
-                + "WHERE o.Status = 'Processing' AND o.Order_ID = ?;";
-        Object[] params = {orderId};
+        String sql = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+                + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
+                + "WHERE o.Status = 'Ordered' AND o.Order_ID = ?";
 
+        Object[] params = {orderId};
         try ( ResultSet rs = execSelectQuery(sql, params)) {
             if (rs.next()) {
                 return new Order(
-                        rs.getInt("Order_ID"), // Order ID
-                        rs.getString("Customer_Name"), // Customer Name
-                        rs.getString("Product_Name"), // Product Name
-                        rs.getString("Street"), // Street
-                        rs.getString("Ward"), // Ward
-                        rs.getString("District"), // District
-                        rs.getString("City"), // City
-                        rs.getString("Country"), // Country
-                        rs.getString("Email"), // Email
-                        rs.getString("Phone"), // Phone
-                        rs.getDate("Order_Date"), // Order Date
-                        rs.getString("Status") // Status
+                        rs.getInt("Order_ID"),
+                        rs.getString("Customer_Name"),
+                        rs.getDouble("Total_Price"),
+                        rs.getString("Street"),
+                        rs.getString("Ward"),
+                        rs.getString("District"),
+                        rs.getString("City"),
+                        rs.getString("Email"),
+                        rs.getString("Phone"),
+                        rs.getDate("Order_Date"),
+                        rs.getString("Status")
                 );
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return null; // Return null if no order found
     }
 
     // Returns a list of orders by email
     public List<Order> getOrderByEmail(String email) {
-        String sql = "SELECT o.Customer_ID, p.Product_Name, o.City, o.Email, o.Phone, o.Amount, o.Order_Date, o.TotalPrice, o.Status "
-                + "FROM Orders o "
-                + "JOIN Products p ON o.Product_ID = p.Product_ID "
-                + "WHERE o.Status = 'Processing' AND o.Email = ?;";
+        String sql = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+                + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
+                + "WHERE o.Email = ?";
         Object[] params = {email};
         List<Order> orderList = new ArrayList<>();
 
         try ( ResultSet rs = execSelectQuery(sql, params)) {
             while (rs.next()) {
                 Order order = new Order(
-                        rs.getInt("Customer_ID"), // Customer ID
-                        rs.getString("Product_Name"), // Product Name
-                        rs.getString("City"), // City
-                        rs.getString("Email"), // Email
-                        rs.getString("Phone"), // Phone
-                        rs.getInt("Amount"), // Amount
-                        rs.getDate("Order_Date"), // Order Date
-                        rs.getString("Status"), // Status
-                        rs.getDouble("TotalPrice") // Total Price
+                        rs.getInt("Order_ID"),
+                        rs.getString("Customer_Name"),
+                        rs.getDouble("Total_Price"),
+                        rs.getString("Street"),
+                        rs.getString("Ward"),
+                        rs.getString("District"),
+                        rs.getString("City"),
+                        rs.getString("Email"),
+                        rs.getString("Phone"),
+                        rs.getDate("Order_Date"),
+                        rs.getString("Status")
                 );
                 orderList.add(order); // Add order to the list
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle SQL exception appropriately
+            // Handle SQL exception appropriately
+            
         }
         return orderList; // Return the list of orders
+    }
+
+    public void updateOrderStatus(int orderId, String status) throws SQLException {
+        String query = "UPDATE Orders SET Status = ? WHERE Order_ID = ?";
+        Object[] params = {status, orderId};
+        execQuery(query, params);
+    }
+
+    public List<Order> getProductsInOrder(int orderId) throws SQLException {
+        List<Order> orderItems = new ArrayList<>();
+        String sql = "SELECT Product_Id, Quantity FROM Order_Details WHERE Order_Id = ?";
+
+        Object[] params = {orderId};
+
+        try ( ResultSet rs = execSelectQuery(sql, params)) {
+            while (rs.next()) {
+                int productId = rs.getInt("Product_Id");
+                int amount = rs.getInt("Quantity"); // Sửa lại "Amount" thành "Quantity" cho đúng với cột trong DB
+                orderItems.add(new Order(orderId, productId, amount));
+            }
+        }
+        return orderItems;
     }
 
 //    public ArrayList<Order> checkBill(int orderId) {

@@ -5,12 +5,16 @@
 package Controller;
 
 import DAO.OrderDAO;
+import DAO.ProductDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Order;
 
 /**
@@ -46,26 +50,7 @@ public class adOrderServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/adOrder.jsp").forward(request, response);
         }
 
-        if ("edit".equals(action) && idParam != null) {
-            try {
-                int id = Integer.parseInt(idParam);
-                Order order = oDAO.getOrderByOrderId(id);
-
-                if (order == null) {
-                    // Nếu không tìm thấy đơn hàng với ID, chuyển hướng về trang danh sách
-                    response.sendRedirect("Order?action=list");
-                    return;
-                }
-
-                // Hiển thị thông tin đơn hàng lên form edit
-                request.setAttribute("order", order);
-                request.getRequestDispatcher("/WEB-INF/adOrderEdit.jsp").forward(request, response);
-            } catch (NumberFormatException e) {
-                // Nếu ID không hợp lệ, chuyển hướng về trang danh sách
-                response.sendRedirect("Order");
-            }
-        }
-        else if ("delete".equals(action) && idParam != null) {
+        if ("delete".equals(action) && idParam != null) {
             try {
                 int id = Integer.parseInt(idParam);
                 Order order = oDAO.getOrderByOrderId(id);
@@ -98,27 +83,41 @@ public class adOrderServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         OrderDAO oDAO = new OrderDAO();
+        ProductDAO pDAO = new ProductDAO();
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
 
-        if ("edit".equals(action)) {
-            int orderId = Integer.parseInt(request.getParameter("id"));
-            String street = request.getParameter("street");
-            String ward = request.getParameter("ward");
-            String district = request.getParameter("district");
-            String city = request.getParameter("city");
-            String country = request.getParameter("country");
-            String status = request.getParameter("status");
+        try {
+            if ("delete".equals(action) && idParam != null && !idParam.isEmpty()) {
+                int orderId = Integer.parseInt(idParam);
+                oDAO.deleteOrder(orderId);
+                response.sendRedirect("Order");
+                return;
+            }
 
-            // Tạo đối tượng Order với thông tin mới và cập nhật vào cơ sở dữ liệu
-            Order order = new Order(orderId, street, ward, district, city, country, status);
-            oDAO.updateOrder(order);
-            response.sendRedirect("Order");
-        }
-        if ("delete".equals(action)) {
-            int id = Integer.parseInt(idParam);
-            oDAO.deleteOrder(id);
-            response.sendRedirect("Order");
+            if ("updateStatus".equals(action) && idParam != null && !idParam.isEmpty()) {
+                int orderId = Integer.parseInt(idParam);
+                String status = request.getParameter("status");
+
+                if (status != null && !status.isEmpty()) {
+                    if ("Canceled".equals(status)) {
+                        // Lấy danh sách sản phẩm từ đơn hàng
+                        List<Order> orderItems = oDAO.getProductsInOrder(orderId);
+                        for (Order item : orderItems) {
+                            pDAO.returnProductStock(item.getProductId(), item.getAmount());
+                        }
+                    }
+
+                    // Cập nhật trạng thái đơn hàng
+                    oDAO.updateOrderStatus(orderId, status);
+                    response.getWriter().write("Success: Order status updated.");
+                } else {
+                    response.getWriter().write("Error: Invalid status.");
+                }
+            }
+        } catch (SQLException | NumberFormatException ex) {
+            Logger.getLogger(adOrderServlet.class.getName()).log(Level.SEVERE, null, ex);
+            response.getWriter().write("Error processing request.");
         }
     }
 

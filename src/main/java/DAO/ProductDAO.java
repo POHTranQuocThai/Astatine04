@@ -851,4 +851,10 @@ public class ProductDAO extends DBContext {
         return null;
     }
 
+    public void returnProductStock(int productId, int amount) throws SQLException {
+        String sql = "UPDATE Products SET Count_In_Stock = Count_In_Stock + ?, Sold = Sold - ? WHERE Product_Id = ? AND Sold >= ?";
+        Object[] params = {amount, amount, productId, amount};
+        execQuery(sql, params);
+    }
+
 }

@@ -94,13 +94,12 @@ public class VoucherDAO extends DBContext {
         String query = "DELETE FROM Voucher WHERE Voucher_ID = ?";
         Object[] params = {voucherId};
         try {
+
             return execQuery(query, params);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-
-
 }
         
