@@ -356,4 +356,47 @@ public class OrderDAO extends DBContext {
         return orderList; // Return the list of orders
     }
 
+//    public ArrayList<Order> checkBill(int orderId) {
+//        ArrayList<Order> orders = new ArrayList<>();
+//        String query = "SELECT \n"
+//                + "    o.Order_Id,\n"
+//                + "    o.Email,\n"
+//                + "    o.Phone,\n"
+//                + "    CONCAT(o.Street, ', ', o.Ward, ', ', o.District, ', ', o.City, ', ', o.Country) AS Address,\n"
+//                + "    o.Order_Date,\n"
+//                + "    o.Total_Price,\n"
+//                + "    o.Status,\n"
+//                + "    p.Product_Name,\n"
+//                + "    od.Price,\n"
+//                + "    od.Quantity,\n"
+//                + "    v.Voucher_Name,\n"
+//                + "    v.Discount\n"
+//                + "FROM [Orders] o\n"
+//                + "JOIN Order_Details od ON o.Order_Id = od.Order_Id\n"
+//                + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
+//                + "LEFT JOIN Vouchers v ON o.Voucher_Id = v.Voucher_Id\n"
+//                + "WHERE o.Order_Id = ? AND o.Status = 'Ordered'  ";
+//
+//        try ( ResultSet rs = execSelectQuery(query, new Object[]{orderId})) {
+//            while (rs.next()) {
+//                orders.add(new Order(
+//                        rs.getInt("Order_Id"),
+//                        rs.getString("Email"),
+//                        rs.getString("Phone"),
+//                        rs.getString("Address"),
+//                        rs.getString("Order_Date"),
+//                        rs.getDouble("Total_Price"),
+//                        rs.getString("Status"),
+//                        rs.getString("Product_Name"),
+//                        rs.getDouble("Price"),
+//                        rs.getInt("Quantity"),
+//                        rs.getString("Voucher_Name"),
+//                        rs.getDouble("Discount")
+//                ));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return orders;
+//    }
 }
