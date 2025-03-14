@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.List;
 import model.Voucher;
 
@@ -82,11 +83,12 @@ public class adCouponServlet extends HttpServlet {
         VoucherDAO vDAO = new VoucherDAO();
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
-
+        LocalDate expiryDate = null;
         if ("create".equals(action)) {
             String name = request.getParameter("voucherName");
             String discountStr = request.getParameter("discount");
             String expiry = request.getParameter("expiry");
+            expiryDate = LocalDate.parse(expiry);
 
             if (name == null || discountStr == null || expiry == null || name.isEmpty() || discountStr.isEmpty() || expiry.isEmpty()) {
                 request.setAttribute("errorMessage", "All fields are required.");
@@ -103,7 +105,7 @@ public class adCouponServlet extends HttpServlet {
                 return;
             }
 
-            Voucher newVoucher = new Voucher(0, name, discount, expiry);
+            Voucher newVoucher = new Voucher(0, name, discount, expiryDate);
             int result = vDAO.createVoucher(newVoucher);
 
             if (result > 0) {
@@ -128,7 +130,7 @@ public class adCouponServlet extends HttpServlet {
                 String name = request.getParameter("voucherName");
                 String discountStr = request.getParameter("discount");
                 String expiry = request.getParameter("expiry");
-
+                expiryDate = LocalDate.parse(expiry);
                 if (name == null || discountStr == null || expiry == null || name.isEmpty() || discountStr.isEmpty() || expiry.isEmpty()) {
                     request.setAttribute("errorMessage", "All fields are required.");
                     request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
@@ -144,7 +146,7 @@ public class adCouponServlet extends HttpServlet {
                     return;
                 }
 
-                Voucher editedVoucher = new Voucher(voucherId, name, discount, expiry);
+                Voucher editedVoucher = new Voucher(voucherId, name, discount, expiryDate);
                 int result = vDAO.editVoucher(editedVoucher);
 
                 if (result > 0) {
