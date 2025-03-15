@@ -851,4 +851,46 @@ public class ProductDAO extends DBContext {
         return null;
     }
 
+    public void returnProductStock(int productId, int amount) throws SQLException {
+        String sql = "UPDATE Products SET Count_In_Stock = Count_In_Stock + ?, Sold = Sold - ? WHERE Product_Id = ? AND Sold >= ?";
+        Object[] params = {amount, amount, productId, amount};
+        execQuery(sql, params);
+    }
+
+    public ArrayList<Products> getTop5Selled() {
+        // Tạo một danh sách trống để lưu các sản phẩm bán chạy
+        ArrayList<Products> prod = new ArrayList<>();
+
+        // Câu truy vấn SQL để chọn tất cả sản phẩm và sắp xếp theo giá giảm dần
+        String query = "SELECT TOP 5 P.*,  C.Category_Name,\n"
+                + "ISNULL(B.brand_name, 'ABCX') AS brand_name\n"
+                + "FROM Products P\n"
+                + "JOIN Brands B ON P.brand_id = B.brand_id\n"
+                + "join Categories C on P.Category_Id = C.Category_Id\n"
+                + "order by P.Sold desc";
+
+        // Thực thi truy vấn và lấy kết quả trả về
+        try ( ResultSet rs = execSelectQuery(query)) {
+            // Lặp qua từng hàng trong tập kết quả
+            while (rs.next()) {
+                String imgData = rs.getString(9);
+                String[] image = (imgData != null) ? imgData.split(",") : new String[]{""};
+                // Tạo đối tượng Products bằng dữ liệu từ từng cột và thêm vào danh sách
+                prod.add(new Products(
+                        rs.getInt(1), // Cột ID
+                        rs.getString(2), // Cột tên sản phẩm
+                        rs.getInt(5), // Cột số lượng
+                        rs.getInt(6), // Cột selled
+                        rs.getDouble(7), // Cột giá
+                        image[0], // Mảng hình ảnh từ cột hình ảnh
+                        rs.getString(10), // Cột tên thương hiệu
+                        rs.getString(11), // Cột trạng thái
+                        rs.getString(12)
+                ));
+            }
+        } catch (Exception e) {
+            // Xử lý lỗi nếu có
+        }
+        return prod; // Trả về danh sách sản phẩm bán chạy
+    }
 }

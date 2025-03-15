@@ -7,36 +7,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this t
     Author     : Ma Tan Loc - CE181795
 */
 
-.status {
-    padding: .6rem .2rem;
-    border-radius: 2rem;
-    text-align: center;
+.status-select {
+    width: auto;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    cursor: pointer;
+    appearance: none;
 }
 
-.status.Processing {
-    background-color: var(--accent-clr);
-    color: #fff;
+.status-select:disabled {
+    cursor: not-allowed;
+    font-weight: 600;
 }
 
-.status.Processing:hover{
-    background-color: #fff;
-    color: var(--accent-clr);
+.status-select.delivered {
+    background-color: #21A691;
+    color: white;
 }
 
-.status.Completed {
-    background-color: var(--line-clr);
-    color: #fff;
-}
-
-.table_body td:nth-child(5),td:nth-child(6) {
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-tbody tr:hover .Processing,
-tbody tr:hover .Admin {
-    color: var(--line-clr);
-    background-color: #fff;
+.status-select.canceled {
+    background-color: #EE4E4E;
+    color: white;
 }

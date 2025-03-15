@@ -111,6 +111,12 @@
     <servlet>
         <servlet-name>LoadBillServlet</servlet-name>
         <servlet-class>Controller.LoadBillServlet</servlet-class>
+        <servlet-name>OrderDataServlet</servlet-name>
+        <servlet-class>Controller.OrderDataServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>adDashboardServlet</servlet-name>
+        <servlet-class>Controller.adDashboardServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>adListServlet</servlet-name>
@@ -226,6 +232,12 @@
     <servlet-mapping>
         <servlet-name>LoadBillServlet</servlet-name>
         <url-pattern>/LoadBill</url-pattern>
+        <servlet-name>OrderDataServlet</servlet-name>
+        <url-pattern>/OrderData</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adDashboardServlet</servlet-name>
+        <url-pattern>/adDashboard</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -78,7 +78,7 @@ public class resetService {
                     + "</head>"
                     + "<body>"
                     + "<div class='email-container'>"
-                        + "<img src='https://drive.google.com/uc?export=view&id=1XICuRbb6ddxISheuuZZWPHpmbMMd0Y3M'/>"
+                    + "<img src='https://drive.google.com/uc?export=view&id=1XICuRbb6ddxISheuuZZWPHpmbMMd0Y3M' alt='logo' width='150' style='display:block;margin: 0 auto;'/>"
                     + "<h2>Hello, " + name + "!</h2>"
                     + "<p>You have requested a password reset. Click the button below to do so:</p>"
                     + "<a href='" + link + "' class='btn'>Reset your Password</a>"

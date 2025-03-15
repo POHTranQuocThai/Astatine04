@@ -67,7 +67,22 @@ public class Order {
         this.transportName = transportName;
     }
 
+
+
     public Order() {
+    }
+
+    public Order(int amount, Date orderDate, String status) {
+        this.amount = amount;
+        this.orderDate = orderDate;
+        this.status = status;
+    }
+
+    public Order(int orderId, int productId, int amount) {
+        this.orderId = orderId;
+        this.productId = productId;
+        this.amount = amount;
+
     }
 
     public Order(int orderId, int productId, int userId, int amount) {
@@ -94,6 +109,7 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+
     public String getPayment() {
         return payment;
     }
@@ -110,6 +126,7 @@ public class Order {
         this.shipping = shipping;
     }
 
+
     public Order(String street, String ward, String district, String city, String country, String phone, String status, Double totalPrice, String email, int userId) {
         this.userId = userId;
         this.street = street;
@@ -124,6 +141,7 @@ public class Order {
     }
 
     //Get All Order(admin)
+
     public Order(int orderId, String productName, String customerName, String city, String email, String phone, int amount, Date orderDate, String status, Double totalPrice) {
         this.orderId = orderId;
         this.productName = productName;
@@ -135,6 +153,19 @@ public class Order {
         this.orderDate = orderDate;
         this.status = status;
         this.totalPrice = totalPrice;
+
+    public Order(int orderId, String customerName, Double totalPrice, String street, String ward, String district, String city, String email, String phone, Date orderDate, String status) {
+        this.orderId = orderId;
+        this.customerName = customerName;
+        this.totalPrice = totalPrice;
+        this.street = street;
+        this.ward = ward;
+        this.district = district;
+        this.city = city;
+        this.email = email;
+        this.phone = phone;
+        this.orderDate = orderDate;
+        this.status = status;
     }
 
     //Edit Order(admin)
