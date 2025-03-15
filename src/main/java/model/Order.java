@@ -28,6 +28,44 @@ public class Order {
     private Double totalPrice;
     private String productName;
     private String customerName;
+    private String payment;
+    private Double shipping;
+    private Double discount;
+    private String transportName;
+
+    public Order(int orderId,String email,String customerName,String phone, String street, String ward, String district, String city, String country,   Date orderDate, Double totalPrice,  String payment, Double discount, String transportName, Double shipping) {
+        this.orderId = orderId;
+        this.street = street;
+        this.ward = ward;
+        this.district = district;
+        this.city = city;
+        this.country = country;
+        this.email = email;
+        this.phone = phone;
+        this.orderDate = orderDate;
+        this.totalPrice = totalPrice;
+        this.customerName = customerName;
+        this.payment = payment;
+        this.discount = discount;
+        this.transportName = transportName;
+        this.shipping = shipping;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public String getTransportName() {
+        return transportName;
+    }
+
+    public void setTransportName(String transportName) {
+        this.transportName = transportName;
+    }
 
     public Order() {
     }
@@ -54,6 +92,22 @@ public class Order {
         this.orderDate = orderDate;
         this.status = status;
         this.totalPrice = totalPrice;
+    }
+
+    public String getPayment() {
+        return payment;
+    }
+
+    public void setPayment(String payment) {
+        this.payment = payment;
+    }
+
+    public Double getShipping() {
+        return shipping;
+    }
+
+    public void setShipping(Double shipping) {
+        this.shipping = shipping;
     }
 
     public Order(String street, String ward, String district, String city, String country, String phone, String status, Double totalPrice, String email, int userId) {
@@ -138,7 +192,7 @@ public class Order {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-    
+
     public int getOrderId() {
         return orderId;
     }

@@ -108,6 +108,10 @@
         <servlet-name>deleteCommentServlet</servlet-name>
         <servlet-class>Controller.deleteCommentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LoadBillServlet</servlet-name>
+        <servlet-class>Controller.LoadBillServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>adListServlet</servlet-name>
         <url-pattern>/List</url-pattern>
@@ -218,6 +222,10 @@
     <servlet-mapping>
         <servlet-name>deleteCommentServlet</servlet-name>
         <url-pattern>/deleteComment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoadBillServlet</servlet-name>
+        <url-pattern>/LoadBill</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

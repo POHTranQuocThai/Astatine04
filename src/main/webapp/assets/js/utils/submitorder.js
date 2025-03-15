@@ -24,12 +24,15 @@ function checkSubmitOrder(total,voucherId,transportId) {
     
     let payment1 = document.querySelector('#payment-1')
     let payment2 = document.querySelector('#payment-2')
+  
+    let pay = '';
 //    console.log(payment1);
 //    console.log(payment2.checked);
     if (!payment1.checked && !payment2.checked) {
         showToast('Please choose a payment method!');
         return;
     }
+    console.log(payment1);
     let confirmModal = document.getElementById("orderConfirmModal");
     let processingModal = document.querySelector(".processing");
     let confirmButton = document.getElementById("confirmOrder");
@@ -41,8 +44,13 @@ function checkSubmitOrder(total,voucherId,transportId) {
     confirmModal.style.display = "block";
 
     confirmButton.onclick = function () {
+        if(payment1.checked){
+            pay = "Cash Payment"
+        }else{
+            pay = "Banking Payment"
+        }
         confirmModal.style.display = "none";
-        window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}`;
+        window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}&paymen=${pay}`;
         document.body.classList.remove("modal-open");
     };
 }
