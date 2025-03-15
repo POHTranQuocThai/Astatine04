@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Cart;
 import model.Order;
 import model.Products;
@@ -115,10 +117,12 @@ public class OrderDAO extends DBContext {
         return rowsAffected;
     }
 
-    public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport) throws SQLException {
+    public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport, String payment) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ? WHERE Customer_Id = ? AND Status = 'Pending'";
+
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ? WHERE Customer_Id = ?";
+
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
         Object[] params = {
             order.getStreet(),
@@ -132,6 +136,7 @@ public class OrderDAO extends DBContext {
             "Ordered",
             order.getTotalPrice(),
             order.getEmail(),
+            payment,
             userId
         };
         try {
@@ -352,6 +357,53 @@ public class OrderDAO extends DBContext {
         return orderList; // Return the list of orders
     }
 
+
+    public Order getBill(int orderId, int customerID) throws SQLException {
+        String query = "SELECT \n"
+                + "    o.Order_Id,\n"
+                + "    o.Email,\n"
+                + "	c.Customer_Name,\n"
+                + "    o.Phone,\n"
+                + "    o.Street,  o.Ward,  o.District,  o.City,  o.Country,\n"
+                + "    o.Order_Date,\n"
+                + "    o.Total_Price,\n"
+                + "    o.Payment,\n"
+                + "    v.Discount,\n"
+                + "	t.Transport_Name\n"
+                + "FROM Orders o\n"
+                + "JOIN Customers c ON o.Customer_Id = c.Customer_Id\n"
+                + "JOIN Order_Details od ON o.Order_Id = od.Order_Id\n"
+                + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
+                + "LEFT JOIN Vouchers v ON o.Voucher_Id = v.Voucher_Id \n"
+                + "LEFT JOIN Transports t ON o.Transport_Id = t.Transport_Id\n"
+                + "WHERE o.Order_Id = ? AND o.Customer_Id = ? AND o.Status = 'Ordered' ; ";
+        Object[] params = {orderId, customerID};
+        try ( ResultSet rs = execSelectQuery(query, params)) {
+            if (rs.next()) {
+                return new Order(
+                        rs.getInt("Order_ID"), // Order ID
+                        rs.getString("Email"), // Customer Name
+                        rs.getString("Customer_Name"), // Product Name
+                        rs.getString("Phone"), // Street
+                        rs.getString("Street"), // Ward
+                        rs.getString("Ward"), // Ward
+                        rs.getString("District"), // Ward
+                        rs.getString("City"), // Ward
+                        rs.getString("Country"), // Ward
+                        rs.getDate("Order_Date"), // District
+                        rs.getDouble("Total_Price"), // City
+                        rs.getString("Payment"), // Country
+                        rs.getDouble("Discount"), // Email
+                        rs.getString("Transport_Name"), // Phone
+                        0.0
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if no order found
+    }
+
     public void updateOrderStatus(int orderId, String status) throws SQLException {
         String query = "UPDATE Orders SET Status = ? WHERE Order_ID = ?";
         Object[] params = {status, orderId};
@@ -393,48 +445,5 @@ public class OrderDAO extends DBContext {
         }
         return orders;
     }
-
-//    public ArrayList<Order> checkBill(int orderId) {
-//        ArrayList<Order> orders = new ArrayList<>();
-//        String query = "SELECT \n"
-//                + "    o.Order_Id,\n"
-//                + "    o.Email,\n"
-//                + "    o.Phone,\n"
-//                + "    CONCAT(o.Street, ', ', o.Ward, ', ', o.District, ', ', o.City, ', ', o.Country) AS Address,\n"
-//                + "    o.Order_Date,\n"
-//                + "    o.Total_Price,\n"
-//                + "    o.Status,\n"
-//                + "    p.Product_Name,\n"
-//                + "    od.Price,\n"
-//                + "    od.Quantity,\n"
-//                + "    v.Voucher_Name,\n"
-//                + "    v.Discount\n"
-//                + "FROM [Orders] o\n"
-//                + "JOIN Order_Details od ON o.Order_Id = od.Order_Id\n"
-//                + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
-//                + "LEFT JOIN Vouchers v ON o.Voucher_Id = v.Voucher_Id\n"
-//                + "WHERE o.Order_Id = ? AND o.Status = 'Ordered'  ";
-//
-//        try ( ResultSet rs = execSelectQuery(query, new Object[]{orderId})) {
-//            while (rs.next()) {
-//                orders.add(new Order(
-//                        rs.getInt("Order_Id"),
-//                        rs.getString("Email"),
-//                        rs.getString("Phone"),
-//                        rs.getString("Address"),
-//                        rs.getString("Order_Date"),
-//                        rs.getDouble("Total_Price"),
-//                        rs.getString("Status"),
-//                        rs.getString("Product_Name"),
-//                        rs.getDouble("Price"),
-//                        rs.getInt("Quantity"),
-//                        rs.getString("Voucher_Name"),
-//                        rs.getDouble("Discount")
-//                ));
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return orders;
-//    }
 }
+        
