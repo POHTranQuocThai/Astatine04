@@ -301,7 +301,7 @@ public class OrderDAO extends DBContext {
     public Order getOrderByOrderId(int orderId) {
         String sql = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
                 + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
-                + "WHERE o.Status = 'Ordered' AND o.Order_ID = ?";
+                + "WHERE o.Order_ID = ?";
 
         Object[] params = {orderId};
         try ( ResultSet rs = execSelectQuery(sql, params)) {

@@ -23,7 +23,7 @@ import model.Products;
  *
  * @author Ma Tan Loc - CE181795
  */
-public class OrderDataServlet extends HttpServlet {
+public class adOrderData extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

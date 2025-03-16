@@ -80,9 +80,7 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         UserDAO uDao = new UserDAO();
         String action = request.getParameter("action");
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
-
+        String email = request.getParameter("email");
         if ("password".equals(action)) {
             String oldPassword = request.getParameter("old_password");
             String password = request.getParameter("password");
@@ -93,7 +91,11 @@ public class ProfileServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 return;
             }
-
+            if (password.length() < 6 || confirmPassword.length() < 6) {
+                request.setAttribute("mess", "Password không duoc duoi 6 ky tu.");
+                request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
+                return;
+            }
             if (!password.equals(confirmPassword)) {
                 request.setAttribute("mess", "Confirm password phải giống với password.");
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);

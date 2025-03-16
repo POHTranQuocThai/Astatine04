@@ -1,0 +1,75 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 15, 2025, 5:33:22 PM
+    Author     : Ma Tan Loc - CE181795
+*/
+
+.table_body {
+    padding: 20px 40px;
+}
+
+.table_bodyContainer {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 0 90px rgba(0, 0, 0, .1);
+}
+
+.chartContainer {
+    display: flex;
+}
+
+.chartContainer-inner {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px;
+    box-shadow: 0 0 90px rgba(0, 0, 0, .1);
+}
+
+.tableContainer {
+    padding: 8px;
+}
+
+.tableContainer table {
+    box-shadow: 0 0 90px rgba(0, 0, 0, .1);
+}
+
+thead th {
+    position: relative;
+    vertical-align: middle;
+    top: 0;
+    left: 0;
+    background-color: #d6d6d6;
+    color: #444;
+}
+
+.status {
+    padding: 10px 12px;
+    border-radius: 2rem;
+    text-align: center;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 100px;
+}
+
+.status.InStock {
+    background-color: #21A691;
+    color: #fff;
+}
+
+.status.OutOfStock {
+    background-color: #EE4E4E;
+    color: #fff;
+}
+
+.status.LowStock {
+    background-color: #333;
+    color: #fff;
+}
+
+.title {
+    padding: 10px 24px;
+}
