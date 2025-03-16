@@ -416,7 +416,7 @@ public class ProductDAO extends DBContext {
             System.out.println("Params: offset=" + offset + ", itemsPerPage=" + itemsPerPage);
             try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String[] image = rs.getString(8).split(",");
+                    String[] image = rs.getString(9).split(",");
                     prod.add(new Products(
                             rs.getInt(1), // Product_ID
                             rs.getString(2), // Product_Name
@@ -424,9 +424,9 @@ public class ProductDAO extends DBContext {
                             rs.getInt(6), // Selled
                             rs.getDouble(7), // Price
                             image[0], // Image
-                            rs.getString(9), // Brand_Name
-                            rs.getString(10), // Category_Name
-                            rs.getString(11) // Description
+                            rs.getString(10), // Brand_Name
+                            rs.getString(11), // Category_Name
+                            rs.getString(12) // Description
                     ));
                 }
                 System.out.println("Result size: " + prod.size());
@@ -498,7 +498,7 @@ public class ProductDAO extends DBContext {
             System.out.println("Params: offset=" + offset + ", itemsPerPage=" + itemsPerPage);
             try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String[] image = rs.getString(8).split(",");
+                    String[] image = rs.getString(9).split(",");
                     prod.add(new Products(
                             rs.getInt(1), // Product_ID
                             rs.getString(2), // Product_Name
@@ -506,9 +506,9 @@ public class ProductDAO extends DBContext {
                             rs.getInt(6), // Selled
                             rs.getDouble(7), // Price
                             image[0], // Image
-                            rs.getString(9), // Brand_Name
-                            rs.getString(10), // Category_Name
-                            rs.getString(11) // Description
+                            rs.getString(10), // Brand_Name
+                            rs.getString(11), // Category_Name
+                            rs.getString(12) // Description
                     ));
                 }
                 System.out.println("Result size: " + prod.size());
@@ -539,10 +539,10 @@ public class ProductDAO extends DBContext {
             System.out.println("Params: offset=" + offset + ", itemsPerPage=" + itemsPerPage);
             try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String[] image = rs.getString(8).split(",");
+                    String[] image = rs.getString(9).split(",");
                     prod.add(new Products(
                             rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6),
-                            rs.getDouble(7), image[0], rs.getString(9), rs.getString(10), rs.getString(11)
+                            rs.getDouble(7), image[0], rs.getString(10), rs.getString(11), rs.getString(12)
                     ));
                 }
                 System.out.println("Result size: " + prod.size());
@@ -585,10 +585,10 @@ public class ProductDAO extends DBContext {
         Object[] params = {search, offset, itemsPerPage};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs.next()) {
-                String[] image = (rs.getString(8) != null && rs.getString(8).contains(",")) ? rs.getString(8).split(",") : new String[]{""};
+                String[] image = (rs.getString(9) != null && rs.getString(9).contains(",")) ? rs.getString(9).split(",") : new String[]{""};
                 find.add(new Products(
                         rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6),
-                        rs.getDouble(7), image[0], rs.getString(9), rs.getString(10), rs.getString(11)
+                        rs.getDouble(7), image[0], rs.getString(10), rs.getString(11), rs.getString(12)
                 ));
             }
         } catch (Exception e) {
@@ -709,7 +709,7 @@ public class ProductDAO extends DBContext {
             // Thực thi truy vấn và xử lý kết quả
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String[] image = rs.getString(8).split(",");
+                String[] image = rs.getString(9).split(",");
                 list.add(new Products(
                         rs.getInt(1), // Product_ID
                         rs.getString(2), // Product_Name
@@ -717,9 +717,9 @@ public class ProductDAO extends DBContext {
                         rs.getInt(6), // Category_Id
                         rs.getDouble(7), // Price
                         image[0], // Image (lấy ảnh đầu tiên)
-                        rs.getString(9), // Brand_Name
-                        rs.getString(10), // Category_Name
-                        rs.getString(11) // Mô tả hoặc thông tin khác
+                        rs.getString(10), // Brand_Name
+                        rs.getString(11), // Category_Name
+                        rs.getString(12) // Mô tả hoặc thông tin khác
                 ));
             }
             rs.close();

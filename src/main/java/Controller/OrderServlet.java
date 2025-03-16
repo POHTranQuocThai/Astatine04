@@ -52,6 +52,8 @@ public class OrderServlet extends HttpServlet {
 
         String voucherParam = request.getParameter("voucher");
         String transportParam = request.getParameter("transport");
+        String payment = request.getParameter("payment");
+        
 
         HttpSession session = request.getSession(false); // false để không tạo mới nếu không có       
         User user = (User) session.getAttribute("User");
@@ -97,7 +99,7 @@ public class OrderServlet extends HttpServlet {
 
                 // Lưu giỏ hàng vào cơ sở dữ liệu và cập nhật thông tin đơn hàng
                 oDAO.saveCartToDatabase(userId, cDAO);
-                num1 = oDAO.orderedSuccess(userId, order, cDAO, voucherParam, transportParam);
+                num1 = oDAO.orderedSuccess(userId, order, cDAO, voucherParam, transportParam,payment);
                 System.out.println("numT1" + num1);
                 request.setAttribute("messOrderSuccess", "Order success");
                 // Xóa giỏ hàng hoàn toàn
