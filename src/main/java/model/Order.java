@@ -153,6 +153,7 @@ public class Order {
         this.orderDate = orderDate;
         this.status = status;
         this.totalPrice = totalPrice;
+    }
 
     public Order(int orderId, String customerName, Double totalPrice, String street, String ward, String district, String city, String email, String phone, Date orderDate, String status) {
         this.orderId = orderId;
@@ -168,6 +169,7 @@ public class Order {
         this.status = status;
     }
 
+    
     //Edit Order(admin)
     public Order(int orderId, String street, String ward, String district, String city, String country, String status) {
         this.orderId = orderId;
