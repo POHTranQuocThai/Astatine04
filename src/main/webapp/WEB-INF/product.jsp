@@ -5,6 +5,7 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,7 +108,7 @@
                                 <a class="dropdown-toggle" href="Checkout" id="navbarDropdownMenuLink" 
                                    aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-bag-heart-fill" style="font-size: 24px;"></i>
-                                   <div class="qty num-order">${SHOP.size() > 0 ? SHOP.size(): 0}</div>
+                                    <div class="qty num-order">${SHOP.size() > 0 ? SHOP.size(): 0}</div>
                                 </a>
                             </div>
                             <!-- /Cart -->
@@ -261,16 +262,8 @@
                     <div class="product-details">
                         <h2 class="product-name">${prodDetails.productName}</h2>
                         <div>
-                            <div class="product-rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>                       
-                            </div>                      
-                        </div>
-                        <div>
-                            <h3 class="product-price">$${prodDetails.price} <del class="product-old-price">$990.00</del></h3>
+
+                            <h3 class="product-price"><fmt:formatNumber value="${prodDetails.price}" pattern="#,###" /> VNĐ</h3>
                             <span class="product-available">In Stock ${prodDetails.countInStock}</span>
                         </div>
 
@@ -290,10 +283,47 @@
                             <li>Category:</li>
                             <li><a href="#">${prodDetails.type}</a></li>                         
                         </ul>
+
+                        <div class="preferential">PREFERENTIAL</div>
+                        <div class="warranty-container">
+                            <div id="warranty-racket" class="warranty-info">
+                                <p><span style="color: #EE4E4E; font-weight: 700">6-month warranty + Free racket grip tape</span></p>
+                                <p>Authentic product guarantee</p>
+                                <p>Pay only after checking & receiving the product</p>
+                                <p>Manufacturer's official warranty <span style="color: #EE4E4E; font-weight: 500">(Excludes domestic & hand-carried goods)</span></p>
+                            </div>
+
+                            <div id="warranty-shoes" class="warranty-info">
+                                <p><span style="color: #EE4E4E; font-weight: 700">12-month warranty</span></p>
+                                <p>Free badminton socks <span style="color: #EE4E4E; font-weight: 500">(long/short, multiple colors)</span></p>
+                                <p>100% genuine product</p>
+                                <p>Cash on delivery available</p>
+                                <p>Manufacturer's official warranty <span style="color: #EE4E4E; font-weight: 500">(Excludes domestic & hand-carried goods)</span></p>
+                            </div>
+
+                            <div id="warranty-default" class="warranty-info">
+                                <p>Authentic product guarantee</p>
+                                <p>Pay after checking the product</p>
+                                <p>Official manufacturer warranty <span style="color: #EE4E4E; font-weight: 500">(Excludes domestic & hand-carried goods)</span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const category = "${prodDetails.type}".toLowerCase(); // Lấy loại sản phẩm
+                    document.querySelectorAll(".warranty-info").forEach(el => el.style.display = "none"); // Ẩn tất cả
 
+                    if (category === "racket") {
+                        document.getElementById("warranty-racket").style.display = "block";
+                    } else if (category === "shoes") {
+                        document.getElementById("warranty-shoes").style.display = "block";
+                    } else {
+                        document.getElementById("warranty-default").style.display = "block";
+                    }
+                });
+            </script>
             <!-- /Product details -->
 
             <!-- Product tab -->
@@ -318,6 +348,10 @@
                         </div>
                         <!-- /tab1 -->
                         <style>
+                            .warranty-info {
+                                display: none;
+                            }
+
                             .comment-box {
                                 width: 100%;
                                 background: #fff;
@@ -351,7 +385,7 @@
                                 margin-top: 10px;
                             }
                             .comment-actions button {
-                                background: #007bff;
+                                background: #21A691;
                                 color: white;
                                 border: none;
                                 padding: 8px 15px;
@@ -370,7 +404,6 @@
                                 padding: 10px;
                                 border-radius: 10px;
                                 margin-top: 10px;
-                                flex-direction: column;
                             }
                             .comment .avatar {
                                 min-width: 40px;
@@ -661,9 +694,7 @@
                         <div class="product-body">
                             <p class="product-category">Category</p>
                             <h3 class="product-name"><a href="Products?view=prod-details&id=${type.productId}">${type.productName}</a></h3>
-                            <h4 class="product-price">$${type.price} <del class="product-old-price">$990.00</del></h4>
-                            <div class="product-rating">
-                            </div>
+                            <h4 class="product-price"><fmt:formatNumber value="${type.price}" pattern="#,###" /> VNĐ</h4>
                             <div class="product-btns">
                                 <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">${type.type}</span></button>
                                 <button class="add-to-compare"><i class="bi bi-bag-heart"></i><span class="tooltipp">${type.selled}</span></button>
@@ -683,10 +714,6 @@
             <!-- /product -->
         </div>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-            }
             #chat-box {
                 width: 50%;
                 height: 300px;
@@ -780,14 +807,6 @@
             <!-- row -->
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <ul class="footer-payments">
-                        <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
-                        <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
-                        <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
-                        <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
-                        <li><a href="#"><i class="fa fa-cc-discover"></i></a></li>
-                        <li><a href="#"><i class="fa fa-cc-amex"></i></a></li>
-                    </ul>
                     <span class="copyright">
                         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                         Copyright &copy;

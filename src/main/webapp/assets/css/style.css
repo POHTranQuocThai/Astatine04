@@ -198,13 +198,13 @@ textarea.input {
 
 .input-number .qty-up {
     right: 0;
-    top: 0;
+    top: 5px;
     border-bottom: 0px;
 }
 
 .input-number .qty-down {
     right: 0;
-    bottom: 0;
+    bottom: 5px;
 }
 
 .input-number .qty-up:hover, .input-number .qty-down:hover {
@@ -1712,24 +1712,33 @@ textarea.input {
 
 .product-details .product-name {
     text-transform: uppercase;
-    font-size: 18px;
-}
-
-.product-details .product-rating {
-    display: inline-block;
-    margin-right: 15px;
-}
-
-.product-details .product-rating>i {
-    color: #E4E7ED;
-}
-
-.product-details .product-rating>i.fa-star {
-    color: #21A691;
+    font-size: 32px;
 }
 
 .product-details .review-link {
     font-size: 12px;
+}
+
+.product-details .preferential {
+    padding: 4px 8px;
+    left: 30px;
+    width: fit-content;
+    background: #fff;
+    border: 2px solid #21A691;
+    border-radius: 8px;
+    position: absolute;
+    color: #21A691;
+    font-weight: 700;
+}
+
+.product-details .warranty-container {
+    margin-top: 30px;
+    padding: 10px 20px;
+    border: 1px solid #21A691;
+    border-radius: 8px;
+}
+.product-details .warranty-info {
+    margin: 10px 0;
 }
 
 .product-details .product-price {
@@ -1738,12 +1747,6 @@ textarea.input {
     margin-top: 10px;
     margin-bottom: 15px;
     color: #21A691;
-}
-
-.product-details .product-price .product-old-price {
-    font-size: 70%;
-    font-weight: 400;
-    color: #8D99AE;
 }
 
 .product-details .product-available {
@@ -1838,7 +1841,7 @@ textarea.input {
 }
 
 .product-details .product-links {
-    margin-top: 15px;
+    margin: 15px 0;
 }
 
 .product-details .product-links li {
@@ -1962,11 +1965,6 @@ textarea.input {
     width: 60px;
     text-align: center;
     margin-right: 5px;
-}
-
-.input-number .qty-up, .input-number .qty-down {
-    cursor: pointer;
-    padding: 5px;
 }
 
 .bi-trash3-fill {
@@ -2532,7 +2530,7 @@ textarea.input {
 .edit-form button:hover {
     background-color: #009e8e;
 }
- 
+
 /*=========================================================
         14 -> PAID ONLINE
 ===========================================================*/

@@ -318,7 +318,37 @@ Author     : Tran Quoc Thai - CE181618
                                                 </c:otherwise>
                                             </c:choose>                      
                                         </div>
-
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" id="couponDropdown"  style="color:#00a089; padding: 10px 0;">
+                                <a href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span  style="color:#00a089">Transport Unit</span>
+                                </a>
+                                <c:if test="${not empty transport}">${applied}</c:if>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        <div class="coupon-dropdown-content"> 
+                                        <%-- Lấy ngày hiện tại trong JSP --%>
+                                        <c:forEach items="${transport}" var="transport">
+                                            <div class="coupon">
+                                                <div class="coupon-left">
+                                                    <img alt="Astatine logo" height="40" src="assets/img/logo.png" width="40" />
+                                                </div>
+                                                <div class="coupon-mid">
+                                                    <div style="font-weight: 600;color: #00a089;">
+                                                        <span>${transport.transportName}</span>
+                                                    </div>
+                                                    <div style="font-size: 13px; color: gray">
+                                                        Price: ?
+                                                    </div>
+                                                </div>
+                                                <div class="coupon-right">
+                                                    <div style="background: #00a089; padding: 6px; border-radius: 5px; color: white;">
+                                                        <a href="Checkout?transportId=${transport.transportId}&voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
                                     </div>
                                 </div>
                                 <div class="dropdown" id="couponDropdown"  style="color:#00a089; padding: 10px 0;">
@@ -361,7 +391,6 @@ Author     : Tran Quoc Thai - CE181618
                                                     </div>
                                                 </div>
                                             </c:forEach> <!-- Đảm bảo có thẻ đóng này -->
-
                                         </div>
                                     </div>
                                 </div>
@@ -423,26 +452,31 @@ Author     : Tran Quoc Thai - CE181618
                                         border-radius: 8px;
                                         background: #fff;
                                         gap: 8px;
-                                        justify-content: center;
+                                        justify-content: space-between;
                                         align-items: center;
                                     }
 
                                     .coupon-left {
                                         display: flex;
                                         align-items: center;
-                                        gap: 10px;
+                                        justify-content: start;
+                                        flex: 0 0 auto;
                                     }
 
                                     .coupon-left img {
-                                        border-radius: 5px;
+                                        border-radius: 4px;
                                         background-color: #00bfa5;
+                                    }
+
+                                    .coupon-mid {
+                                        flex-grow: 1;
+                                        padding: 0 15px;
                                     }
 
                                     .coupon-right {
                                         display: flex;
-                                        flex-direction: column;
-                                        align-items: flex-end;
-                                        gap: 8px;
+                                        align-items: center;
+                                        justify-content: end
                                     }
 
                                     .coupon-right-numbers span {

@@ -32,3 +32,55 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this t
     background-color: #EE4E4E;
     color: white;
 }
+
+.filter-container {
+    gap: 10px;
+    display: flex;
+    padding: 0 0 10px 0;
+    align-items: center;
+}
+
+.filter-container input {
+    padding: 4px;
+    border-radius: 8px;
+    background: #eee;
+    border: 1px solid #ccc;
+}
+
+.filter-container button {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #eee;
+    border: 1px solid #ccc;
+}
+
+.filter-container select {
+    padding: 4px 16px;
+    border-radius: 8px;
+    background: #eee;
+    border: 1px solid #ccc;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination button{
+    padding: .6rem 1rem;
+    margin: 0 5px;
+    border-radius: 0.6rem;
+    background-color: #f4f4f4;
+    color: #060D10;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination button:hover {
+    background-color: #21A691; /* Change background on hover */
+    color: white; /* Change text color on hover */
+}   

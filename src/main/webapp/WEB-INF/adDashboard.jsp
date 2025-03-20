@@ -232,6 +232,12 @@
                         <span>Voucher</span>
                     </a>
                 </li>
+                <li>
+                    <a href="Transport">
+                        <i class='bx bxs-package'></i>                        
+                        <span>Transport</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -256,7 +262,7 @@
                         <div class="chartContainer-inner" id="chartContainer1" style="height: 370px; width: 70%;"></div>
                         <div class="chartContainer-inner" id="chartContainer2" style="height: 370px; width: 30%;"></div>
                     </div>
-                    <div class="tittle">
+                    <div class="title">
                         <h3>Top 5 Selling Products.</h3>
                     </div>
                     <div class="tableContainer">
@@ -272,29 +278,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            <c:forEach var="p" items="${productList}">
-                                <tr>
-                                    <td>${p.productName}</td>
-                                    <td>${p.type}</td>
-                                    <td>${p.brand}</td>
-                                    <td>${p.selled}</td>
-                                    <td>
-                                <c:choose>
-                                    <c:when test="${p.countInStock == 0}">
-                                        <span class="status OutOfStock">Out of Stock</span>
-                                    </c:when>
-                                    <c:when test="${p.countInStock <= 5}">
-                                        <span class="status LowStock">Low Stock</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="status InStock">In Stock</span>
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
+                                <c:forEach var="p" items="${productList}">
+                                    <tr>
+                                        <td>${p.productName}</td>
+                                        <td>${p.type}</td>
+                                        <td>${p.brand}</td>
+                                        <td>${p.selled}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${p.countInStock == 0}">
+                                                    <span class="status OutOfStock">Out of Stock</span>
+                                                </c:when>
+                                                <c:when test="${p.countInStock <= 5}">
+                                                    <span class="status LowStock">Low Stock</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status InStock">In Stock</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
 
-                                <td><fmt:formatNumber value="${p.price}" pattern="#,###" /> VNĐ</td>
-                                </tr>
-                            </c:forEach>
+                                        <td><fmt:formatNumber value="${p.price}" pattern="#,###" /> VNĐ</td>
+                                    </tr>
+                                </c:forEach>
                             </tbody>
                         </table>
                     </div>

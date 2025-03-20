@@ -20,8 +20,8 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
 
         <!-- CSS Link -->
-        <link rel="stylesheet" href="./assets/css/adOrder.css"/>
-        <link rel="stylesheet" href="./assets/css/adCoupon.css"/>
+        <link rel="stylesheet" href="./assets/css/Admin.css">
+        <link rel="stylesheet" href="./assets/css/adModal.css"/>
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -75,14 +75,14 @@
 
         <div id="editModal" class="modal-container">
             <div class="modal-box"> 
-                <h1>Edit User</h1>
+                <h1>Edit Voucher</h1>
 
                 <div class="form">
                     <form action="Coupon?action=edit" method="post">
                         <input type="hidden" name="action" value="edit">
                         <input type="hidden" name="id" id="couponId" value="${coupon.voucherId}">
 
-                        <div class="center">
+                        <div class="center-bottom">
                             <label for="fullname">Name:</label>
                             <input type="text" id="fullname" name="voucherName" value="${coupon.name}" placeholder="Voucher Name"><br>
 
@@ -92,7 +92,7 @@
                             <label for="expiry">Expiration:</label>
                             <input type="date" id="expiry" name="expiry" value="${coupon.expiry}" placeholder="Expiration Date" required><br>
                         </div>
-                        <div class="center-bottom">
+                        <div class="center-bottom-delete">
                             <!-- Save Button -->
                             <button type="submit" class="submit-btn" onclick="location.href = 'Coupon'">
                                 Save Changes

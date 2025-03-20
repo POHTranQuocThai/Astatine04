@@ -41,7 +41,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public Voucher getVoucherById(int voucherId) {
-        String query = "SELECT * FROM Voucher WHERE Voucher_ID = ?";
+        String query = "SELECT * FROM Vouchers WHERE Voucher_ID = ?";
         Object[] params = {voucherId};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             if (rs.next()) {
@@ -53,14 +53,13 @@ public class VoucherDAO extends DBContext {
                 );
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }
 
     public int createVoucher(Voucher voucher) {
-        String query = "INSERT INTO Voucher (Voucher_ID, Voucher_Name, Discount, Expiry) "
-                + "VALUES ((SELECT COALESCE(MAX(Voucher_ID), 0) + 1 FROM Voucher), ?, ?, ?)";
+        String query = "INSERT INTO Vouchers (Voucher_ID, Voucher_Name, Discount, Expiry)\n"
+                + "VALUES ((SELECT COALESCE(MAX(Voucher_ID), 0) + 1 FROM Vouchers), ?, ?, ?)";
         Object[] params = {
             voucher.getName(),
             voucher.getDiscount(),
@@ -68,14 +67,13 @@ public class VoucherDAO extends DBContext {
         };
         try {
             return execQuery(query, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
         }
         return 0;
     }
 
     public int editVoucher(Voucher voucher) {
-        String query = "UPDATE Voucher SET Voucher_Name = ?, Discount = ?, Expiry = ? WHERE Voucher_ID = ?";
+        String query = "UPDATE Vouchers SET Voucher_Name = ?, Discount = ?, Expiry = ? WHERE Voucher_ID = ?";
         Object[] params = {
             voucher.getName(),
             voucher.getDiscount(),
@@ -91,7 +89,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public int deleteVoucher(int voucherId) {
-        String query = "DELETE FROM Voucher WHERE Voucher_ID = ?";
+        String query = "DELETE FROM Vouchers WHERE Voucher_ID = ?";
         Object[] params = {voucherId};
         try {
 
@@ -102,4 +100,3 @@ public class VoucherDAO extends DBContext {
         return 0;
     }
 }
-        

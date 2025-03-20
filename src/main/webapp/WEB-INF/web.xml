@@ -120,6 +120,10 @@
         <servlet-name>adOrderDataServlet</servlet-name>
         <servlet-class>Controller.adOrderDataServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>adTransportServlet</servlet-name>
+        <servlet-class>Controller.adTransportServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>adListServlet</servlet-name>
         <url-pattern>/List</url-pattern>
@@ -242,6 +246,10 @@
     <servlet-mapping>
         <servlet-name>adOrderDataServlet</servlet-name>
         <url-pattern>/OrderData</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adTransportServlet</servlet-name>
+        <url-pattern>/Transport</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

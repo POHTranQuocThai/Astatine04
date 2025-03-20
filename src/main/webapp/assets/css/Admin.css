@@ -178,6 +178,13 @@ tbody tr:hover {
     }
 }
 
+td:nth-child(3) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
 tbody tr td,
 tbody tr td p,
 tbody tr td svg {

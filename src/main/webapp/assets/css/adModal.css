@@ -6,8 +6,8 @@ form {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 20px;
-    padding: 2rem;
+    /*    gap: 20px;
+        padding: 2rem;*/
 }
 
 #deleteUserModal form {
@@ -40,6 +40,7 @@ div#deleteUserModal {
     width: 100%;
     display: flex ;
     flex-direction: column;
+    margin: 20px 0;
 }
 
 .center-bottom label {
@@ -48,9 +49,34 @@ div#deleteUserModal {
     margin-right: 10px;
 }
 
+.label-form-top {
+    position: absolute;
+    top: 70px;
+    left: 50px;
+    background: #fff;
+}
+
+.label-form-bottom {
+    position: absolute;
+    bottom: 275px;
+    left: 50px;
+    background: #fff;
+}
+
+.center-bottom.user {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    margin: 20px 0;
+    justify-content: space-between;
+    padding: 28px 16px 16px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+}
+
 .center-bottom-delete {
     display: flex;
-    justify-content: space-between;
+    gap: 20px;
     width: 100%;
 }
 
@@ -59,16 +85,15 @@ div#deleteUserModal {
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    width: 650px;
     height: fit-content;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-height: 200vh;
     z-index: 99;
     text-align: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal{
@@ -81,6 +106,7 @@ div#deleteUserModal {
 }
 
 .modal-box {
+    width: 500px;
     padding: 2rem;
     background: white;
     border-radius: 16px;
@@ -99,7 +125,7 @@ div#deleteUserModal {
 }
 
 .modal-box input {
-    width: 16rem;
+    width: 100%;
     border-radius: 8px;
     border: none;
     padding: .8rem;
@@ -178,12 +204,11 @@ select {
 textarea {
     background: #eee;
     width: 100%;
-    height: 10rem;
+    height: 5rem;
     border: none;
     border-radius: .6rem;
     padding: .8rem;
     color: #060D10;
-    overflow: hidden;
     resize: none;
 }
 
@@ -231,16 +256,15 @@ textarea {
 }
 
 .submit-btn {
-    width: 45%;
-    padding: 0.8rem;
+    width: 100%;
+    padding: 8px 4px;
     background-color: #21A691;
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    margin-top: 0.5rem;
     transition: background-color 0.3s;
 }
 
@@ -250,14 +274,13 @@ textarea {
 
 .close-btn {
     width: 100%;
-    padding: 0.8rem;
+    padding: 8px 4px;
     background-color: #060D10;
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
-    margin-top: 0.5rem;
     cursor: pointer;
     transition: background-color 0.3s;
 }

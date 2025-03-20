@@ -7,6 +7,7 @@ package Controller;
 import DAO.CartDAO;
 import DAO.OrderDAO;
 import DAO.ProductDAO;
+import DAO.TransportDAO;
 import DAO.VoucherDAO;
 import com.google.gson.JsonObject;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class CheckoutServlet extends HttpServlet {
             throws ServletException, IOException {
         ProductDAO pDAO = new ProductDAO();
         VoucherDAO vDAO = new VoucherDAO();
+        TransportDAO tDAO = new TransportDAO();
         String action = request.getParameter("action");
         String id = request.getParameter("id");
         String voucherId = request.getParameter("voucherId");
@@ -96,6 +98,7 @@ public class CheckoutServlet extends HttpServlet {
         // Thiết lập thuộc tính cho checkout.jsp
         request.setAttribute("brand", pDAO.getAllBrand());
         request.setAttribute("type", pDAO.getAllType());
+        request.setAttribute("transport", tDAO.getAllTransport());
         request.setAttribute("vouchers", vDAO.getAllVoucher());
         
         request.getRequestDispatcher("/WEB-INF/checkout.jsp").forward(request, response);

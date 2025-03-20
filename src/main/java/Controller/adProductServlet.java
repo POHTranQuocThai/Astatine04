@@ -187,9 +187,9 @@ public class adProductServlet extends HttpServlet {
                     imagePaths.append("assets\\img\\product\\").append(fileName); // Lưu đường dẫn ảnh
                 }
             }
-
             // Tạo product với chuỗi đường dẫn ảnh
-            Products product = new Products(0, productName, countInStock, selled, price, brand, description, type, brand);
+
+            Products product = new Products(0, productName, countInStock, selled, price, imagePaths.toString(), description, type, brand);
             int result = pDAO.createProduct(product);
             if (result > 0) {
                 response.sendRedirect("Product?action=list");  // Thành công
@@ -247,7 +247,7 @@ public class adProductServlet extends HttpServlet {
                 Products product = new Products(productId, productName, countInStock, selled, price, image, description, type, brand);
                 try {
                     pDAO.updateProduct(product);
-                    System.out.println("L"+ pDAO.updateProduct(product));
+                    System.out.println("L" + pDAO.updateProduct(product));
                     request.setAttribute("types", pDAO.getAllType());
                     request.setAttribute("brands", pDAO.getAllBrand());
                     response.sendRedirect("Product?action=list");
