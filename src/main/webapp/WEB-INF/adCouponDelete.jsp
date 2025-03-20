@@ -21,7 +21,7 @@
 
         <!-- CSS Link -->
         <link rel="stylesheet" href="./assets/css/Admin.css">
-        <link rel="stylesheet" href="./assets/css/adOrder.css"/>
+        <link rel="stylesheet" href="./assets/css/adModal.css"/>
 
         <!-- Icon New-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,11 +32,11 @@
     <body>
         <div id="editModal" class="modal-container">
             <div class="modal-box">
-                <h1 style="text-align: center; padding: 2rem 0 0 0;">Delete Coupon</h1>
+                <h1 style="text-align: center;">Delete Coupon</h1>
                 <form action="Coupon?action=delete" method="post">
                     <input type="hidden" name="voucherId" value="${coupon.voucherId}">
-                    <div>
-                        <p style="font-size: 1.5rem;">Do you want to delete <span style="font-weight: 500; color: #21A691">${coupon.name}</span>?</p>
+                    <div class="center-bottom">
+                        <p style="font-size: 20px;">Do you want to delete <span style="font-weight: 500; color: #21A691">${coupon.name}</span>?</p>
                     </div>
 
                     <div class="center-bottom-delete">                       

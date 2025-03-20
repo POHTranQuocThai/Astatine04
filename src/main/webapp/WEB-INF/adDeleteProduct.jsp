@@ -73,11 +73,11 @@
 
         <div id="editModal" class="modal-container">
             <div class="modal-box">
-                <h1 style="text-align: center; padding: 2rem 0 0 0;">Delete Product</h1>
+                <h2 style="text-align: center">Delete Product</h2>
                 <form action="Product?action=delete" method="post">
                     <input type="hidden" name="id" value="${product.productId}">
                     <div class="center-bottom">
-                        <p style="font-size: 1.5rem;">Do you want to delete <span style="font-weight: 500; color: #21A691">${product.productName}</span>?</p>
+                        <p style="font-size: 20px;">Do you want to delete <span style="font-weight: 500; color: #21A691">${product.productName}</span>?</p>
                     </div>
 
                     <div class="center-bottom-delete">

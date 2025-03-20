@@ -26,55 +26,61 @@
             <link rel="stylesheet" href="./assets/css/adModal.css"/>
 
             <!-- Icon New-->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_drop_down" />
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>        
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_drop_down" />
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>        
 
-    </head>
+        </head>
 
-    <body>
-        <nav id="sidebar">
-            <ul>
-                <li>
-                    <a href="Home" style="padding: 0;" class="logo">
-                        <img src="./assets/img/Astatine-white.png" alt="logo"/>
-                    </a>
-                    <button onclick="toggleSidebar()" id="toggle-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="m382-480 294 294q15 15 14.5 35T675-116q-15 15-35 15t-35-15L297-423q-12-12-18-27t-6-30q0-15 6-30t18-27l308-308q15-15 35.5-14.5T676-844q15 15 15 35t-15 35L382-480Z" /></svg>
-                    </button>
-                </li>
-                <li>
-                    <a href="Dashboard">
-                        <i class='bx bxs-dashboard'></i>                        
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="User">
-                        <i class='bx bxs-user'></i>                        
-                        <span>User</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="Product">
-                        <i class='bx bxs-spreadsheet' ></i>
-                        <span>Products</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="Order">
-                        <i class='bx bxs-cart'></i>                        
-                        <span>Order</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="Coupon">
-                        <i class='bx bxs-discount' ></i>                        
-                        <span>Voucher</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <body>
+            <nav id="sidebar">
+                <ul>
+                    <li>
+                        <a href="Home" style="padding: 0;" class="logo">
+                            <img src="./assets/img/Astatine-white.png" alt="logo"/>
+                        </a>
+                        <button onclick="toggleSidebar()" id="toggle-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="m382-480 294 294q15 15 14.5 35T675-116q-15 15-35 15t-35-15L297-423q-12-12-18-27t-6-30q0-15 6-30t18-27l308-308q15-15 35.5-14.5T676-844q15 15 15 35t-15 35L382-480Z" /></svg>
+                        </button>
+                    </li>
+                    <li>
+                        <a href="Dashboard">
+                            <i class='bx bxs-dashboard'></i>                        
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="User">
+                            <i class='bx bxs-user'></i>                        
+                            <span>User</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Product">
+                            <i class='bx bxs-spreadsheet' ></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Order">
+                            <i class='bx bxs-cart'></i>                        
+                            <span>Order</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Coupon">
+                            <i class='bx bxs-discount' ></i>                        
+                            <span>Voucher</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Transport">
+                            <i class='bx bxs-package'></i>                        
+                            <span>Transport</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
             <!-- Admin User -->   
             <main class="table">
@@ -155,61 +161,66 @@
                     </div>
                 </div>
                 <div class="modal" id="editUserModal">
-                    <div class="modal-box" style="padding: 0"> 
+                    <div class="modal-box"> 
                         <div class="form">
                             <h1>Edit User</h1>
                             <form action="User?action=edit" method="post">
-
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="id" id="userId" value="${user.userId}">
                                 <input type="hidden" id="password" name="password" value="${user.password}">
                                 <input type="hidden" id="country" name="country" value="${user.country}">
-
-                                <div class="top">
-                                    <!-- Full Name -->
-                                    <label for="fullname">Full Name:</label>
-                                    <input type="text" id="fullname" name="fullname" value="${user.fullname}" placeholder="Full Name">
-
-                                    <!-- Email -->
-                                    <label for="email">Email:</label>
-                                    <input type="email" id="email" name="email" value="${user.email}" placeholder="Enail" readonly>                          
-
-                                    <!-- Phone -->
-                                    <label for="phone">Phone:</label>
-                                    <input type="text" id="phone" name="phone" value="${user.phone}" placeholder="Phone">
-
-                                    <div class="admin-check">
-                                        <!-- Admin Flag -->
-                                        <label for="isAdmin">Admin:</label>
-                                        <input type="checkbox" id="isAdmin" name="isAdmin" ${user.isAdmin ? 'checked' : ''}>
+                                <div class="label-form-top"><h3>Personal Information</h3></div>
+                                <div class="center-bottom user">
+                                    <div class="top-left">
+                                        <!-- Full Name -->
+                                        <label for="fullname">Full Name:</label>
+                                        <input type="text" id="fullname" name="fullname" value="${user.fullname}" placeholder="Full Name">
+                                        <div class="admin-check">
+                                            <!-- Admin Flag -->
+                                            <label for="isAdmin">Admin:</label>
+                                            <input type="checkbox" id="isAdmin" name="isAdmin" ${user.isAdmin ? 'checked' : ''}>
+                                        </div>
+                                    </div>
+                                    <div class="top-right">
+                                        <!-- Email -->
+                                        <label for="email">Email:</label>
+                                        <input type="email" id="email" name="email" value="${user.email}" placeholder="Enail" readonly>                          
+                                        <!-- Phone -->
+                                        <label for="phone">Phone:</label>
+                                        <input type="text" id="phone" name="phone" value="${user.phone}" placeholder="Phone">
                                     </div>
                                 </div>
+                                
+                                <div class="label-form-bottom"><h3>Address</h3></div>
+                                <div class="center-bottom user">
+                                    <div class="top-left">
+                                        <!-- Street -->
+                                        <label for="street">Street:</label>
+                                        <input type="text" id="street" name="street" value="${user.street}" placeholder="Street">
 
-                                <div class="bottom">
-                                    <!-- Street -->
-                                    <label for="street">Street:</label>
-                                    <input type="text" id="street" name="street" value="${user.street}" placeholder="Street">
+                                        <!-- Ward -->
+                                        <label for="ward">Ward:</label>
+                                        <input type="text" id="ward" name="ward" value="${user.ward}" placeholder="Ward">
+                                    </div>
+                                    <div class="top-right">
+                                        <!-- District -->
+                                        <label for="district">District:</label>
+                                        <input type="text" id="district" name="district" value="${user.district}" placeholder="District">
 
-                                    <!-- Ward -->
-                                    <label for="ward">Ward:</label>
-                                    <input type="text" id="ward" name="ward" value="${user.ward}" placeholder="Ward">
-
-                                    <!-- District -->
-                                    <label for="district">District:</label>
-                                    <input type="text" id="district" name="district" value="${user.district}" placeholder="District">
-
-                                    <!-- City -->
-                                    <label for="city">City:</label>
-                                    <input type="text" id="city" name="city" value="${user.city}" placeholder="City">
+                                        <!-- City -->
+                                        <label for="city">City:</label>
+                                        <input type="text" id="city" name="city" value="${user.city}" placeholder="City">
+                                    </div>
                                 </div>
-
-                                <!-- Save Button -->
-                                <button class="submit-btn" id="save">Save</button>
-                                <!-- Close Button -->
-                                <button class=" close-btn" id="close">Close</button>
+                                <div class="center-bottom-delete">
+                                    <!-- Save Button -->
+                                    <button class="submit-btn" id="save">Save</button>
+                                    <!-- Close Button -->
+                                    <button class=" close-btn" id="close">Close</button>
+                                </div>
                             </form>
                         </div>
-                    </div>
+                    </div>  
                 </div>
                 <div class="pagination">
                     <c:if test="${index > 1}">

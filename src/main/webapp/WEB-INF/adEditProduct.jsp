@@ -134,17 +134,18 @@
                             </div>
                         </div>
 
+                        <div class="center-bottom-delete">
 
-                        <!-- Save Button -->
-                        <button type="submit" class="submit-btn" onclick="location.href = 'Product?action=list'">
-                            Confirm
-                        </button>
+                            <!-- Save Button -->
+                            <button type="submit" class="submit-btn" onclick="location.href = 'Product?action=list'">
+                                Confirm
+                            </button>
 
-                        <!-- Close Button -->
-                        <button type="button" class="close-btn" onclick="location.href = 'Product?action=list'">
-                            Close
-                        </button>
-
+                            <!-- Close Button -->
+                            <button type="button" class="close-btn" onclick="location.href = 'Product?action=list'">
+                                Close
+                            </button>
+                        </div>  
                     </form>
                 </div>
             </div>

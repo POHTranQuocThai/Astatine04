@@ -118,10 +118,10 @@ public class ProductDAO extends DBContext {
         try ( ResultSet rs = execSelectQuery(query, params)) {
             // Lặp qua từng hàng trong tập kết quả
             if (rs.next()) {
-                String[] image = rs.getString(9).split(",");
+                String images = rs.getString(9);
                 return new Products(
                         rs.getInt(1), rs.getString(2), rs.getInt(5), rs.getInt(6),
-                        rs.getDouble(7), image[0], rs.getString(10), rs.getString(11), rs.getString(12)
+                        rs.getDouble(7), images, rs.getString(10), rs.getString(11), rs.getString(12)
                 );
             }
         } catch (Exception e) {

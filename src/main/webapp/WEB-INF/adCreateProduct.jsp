@@ -125,16 +125,18 @@
                                 <label for="image">Choose a image:</label>
                             </div>
                         </div>
+                        <div class="center-bottom-delete">
+                            <!-- Save Button -->
+                            <button type="submit" class="submit-btn" onclick="return validateForm()">
+                                Confirm
+                            </button>
 
-                        <!-- Save Button -->
-                        <button type="submit" class="submit-btn" onclick="return validateForm()">
-                            Confirm
-                        </button>
+                            <!-- Close Button -->
+                            <button type="button" class="close-btn" onclick="location.href = 'Product?action=list'">
+                                Close
+                            </button>
+                        </div>  
 
-                        <!-- Close Button -->
-                        <button type="button" class="close-btn" onclick="location.href = 'Product?action=list'">
-                            Close
-                        </button>
                     </form>
                 </div>
             </div>
