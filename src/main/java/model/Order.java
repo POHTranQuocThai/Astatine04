@@ -29,11 +29,11 @@ public class Order {
     private String productName;
     private String customerName;
     private String payment;
-    private Double shipping;
+    private Double shippingFee;
     private Double discount;
     private String transportName;
 
-    public Order(int orderId,String email,String customerName,String phone, String street, String ward, String district, String city, String country,   Date orderDate, Double totalPrice,  String payment, Double discount, String transportName, Double shipping) {
+    public Order(int orderId, String email, String customerName, String phone, String street, String ward, String district, String city, String country, Date orderDate, Double totalPrice, String payment, Double discount, String transportName, Double shippingFee) {
         this.orderId = orderId;
         this.street = street;
         this.ward = ward;
@@ -48,7 +48,7 @@ public class Order {
         this.payment = payment;
         this.discount = discount;
         this.transportName = transportName;
-        this.shipping = shipping;
+        this.shippingFee = shippingFee;
     }
 
     public Double getDiscount() {
@@ -65,11 +65,6 @@ public class Order {
 
     public void setTransportName(String transportName) {
         this.transportName = transportName;
-    }
-
-
-
-    public Order() {
     }
 
     public Order(int amount, Date orderDate, String status) {
@@ -109,7 +104,6 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
-
     public String getPayment() {
         return payment;
     }
@@ -119,13 +113,12 @@ public class Order {
     }
 
     public Double getShipping() {
-        return shipping;
+        return shippingFee;
     }
 
-    public void setShipping(Double shipping) {
-        this.shipping = shipping;
+    public void setShipping(Double shippingFee) {
+        this.shippingFee = shippingFee;
     }
-
 
     public Order(String street, String ward, String district, String city, String country, String phone, String status, Double totalPrice, String email, int userId) {
         this.userId = userId;
@@ -141,7 +134,6 @@ public class Order {
     }
 
     //Get All Order(admin)
-
     public Order(int orderId, String productName, String customerName, String city, String email, String phone, int amount, Date orderDate, String status, Double totalPrice) {
         this.orderId = orderId;
         this.productName = productName;
@@ -169,7 +161,6 @@ public class Order {
         this.status = status;
     }
 
-    
     //Edit Order(admin)
     public Order(int orderId, String street, String ward, String district, String city, String country, String status) {
         this.orderId = orderId;
@@ -338,4 +329,11 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+    public Double getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(Double shippingFee) {
+        this.shippingFee = shippingFee;
+    }
 }

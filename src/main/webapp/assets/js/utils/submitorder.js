@@ -20,11 +20,11 @@ function showToast(message, type) {
     }).showToast();
 }
 
-function checkSubmitOrder(total,voucherId,transportId) {
-    
+function checkSubmitOrder(total, voucherId) {
+
     let payment1 = document.querySelector('#payment-1')
     let payment2 = document.querySelector('#payment-2')
-  
+
     let pay = '';
 //    console.log(payment1);
 //    console.log(payment2.checked);
@@ -42,15 +42,17 @@ function checkSubmitOrder(total,voucherId,transportId) {
 
     document.body.classList.add("modal-open");
     confirmModal.style.display = "block";
-
+    let feeValue = document.querySelector(".fee").textContent.trim();
+    const transportId = document.querySelector("#transportId").value;
+    console.log(transportId);
     confirmButton.onclick = function () {
-        if(payment1.checked){
+        if (payment1.checked) {
             pay = "Cash Payment"
-        }else{
+        } else {
             pay = "Banking Payment"
         }
         confirmModal.style.display = "none";
-        window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}&paymen=${pay}`;
+            window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}&payment=${pay}&shipPrice=${feeValue}`;
         document.body.classList.remove("modal-open");
     };
 }

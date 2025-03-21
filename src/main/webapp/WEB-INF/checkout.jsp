@@ -269,7 +269,7 @@ Author     : Tran Quoc Thai - CE181618
                                         <c:set var="totalPrice" value="${totalPrice + total}" />
 
                                     </c:forEach> 
-                                    <c:set value="${totalPrice * (dis/100.0)}" var="discounted"/>
+                                    <c:set value="${totalPrice * (discount/100.0)}" var="discounted"/>
                                 </div>
                             </div>
                         </div>   
@@ -288,48 +288,72 @@ Author     : Tran Quoc Thai - CE181618
                                         <div>Provisional</div>
                                         <div id="totalPriceDisplay">$${totalPrice}</div>
                                     </div>
+                                    <c:set var="firstTransportId" value="${transport[0].transportId}" />
+                                    <c:set var="firstShip" value="${shipPrice + (transport[0].transportId * 500)}" />
                                     <div class="order-col">
                                         <div>Shipping</div>
                                         <div>
-                                            <c:choose>
-                                                <c:when test="${totalPrice == 0}">
-                                                    <c:set var="ship" value="0"/>
-                                                    <strong>+$0</strong>
-                                                </c:when>
-                                                <c:when test="${totalPrice <= 50}">
-                                                    <c:set var="ship" value="20"/>
-                                                    <strong>+$20</strong>
-                                                </c:when>
-                                                <c:when test="${totalPrice <= 100}">
-                                                    <c:set var="ship" value="15"/>
-                                                    <strong>+$15</strong>
-                                                </c:when>
-                                                <c:when test="${totalPrice <= 200}">
-                                                    <c:set var="ship" value="10"/>
-                                                    <strong>+$10</strong>
-                                                </c:when>
-                                                <c:when test="${totalPrice <= 300}">
-                                                    <c:set var="ship" value="5"/>
-                                                    <strong>+$5</strong>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:set var="ship" value="0"/>
-                                                    <strong>FREE</strong>
-                                                </c:otherwise>
-                                            </c:choose>                      
+                                            <strong class="fee">${firstShip}</strong>                   
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dropdown" id="couponDropdown"  style="color:#00a089; padding: 10px 0;">
+                                <a href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span  style="color:#00a089">Voucher</span>
+                                </a>
+                                <c:if test="${not empty discount}">${applied}</c:if>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        <div class="coupon-dropdown-content"> 
+                                        <%-- Lấy ngày hiện tại trong JSP --%>
+                                        <c:set var="today" value="<%= LocalDate.now().toString()%>" />
+                                        <c:forEach items="${vouchers}" var="voucher">
+                                            <c:set var="isExpired" value="${voucher.expiry < today}" />
+                                            <div class="coupon ${isExpired ? 'disabled' : ''}">
+                                                <div class="coupon-left">
+                                                    <img alt="Astatine logo" height="40" src="assets/img/logo.png" width="40" />
+                                                </div>
+                                                <div class="coupon-mid">
+                                                    <div style="font-weight: 600;color: #00a089;">
+                                                        <span>Get ${voucher.discount}% off your total bill</span>
+                                                    </div>
+                                                    <div style="font-size: 13px; color: gray">
+                                                        Expired: ${voucher.expiry}
+                                                    </div>
+                                                </div>
+                                                <div class="coupon-right">
+                                                    <c:choose>
+                                                        <c:when test="${isExpired}">
+                                                            <div class="expired" style="background: gray; padding: 6px; border-radius: 5px; color: white;">
+                                                                Expired
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div style="background: #00a089; padding: 6px; border-radius: 5px; color: white;">
+                                                                <a href="Checkout?voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </div>
+                                        </c:forEach> <!-- Đảm bảo có thẻ đóng này -->
                                     </div>
                                 </div>
                             </div>
                             <div class="dropdown" id="couponDropdown"  style="color:#00a089; padding: 10px 0;">
                                 <a href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span  style="color:#00a089">Transport Unit</span>
-                                </a>
-                                <c:if test="${not empty transport}">${applied}</c:if>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                        <div class="coupon-dropdown-content"> 
+                                </a>    
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <div class="coupon-dropdown-content"> 
                                         <%-- Lấy ngày hiện tại trong JSP --%>
                                         <c:forEach items="${transport}" var="transport">
+
+
+                                            <c:set var="extraFee" value="${transport.transportId * 500}" />
+                                            <c:set var="ship" value="${shipPrice + extraFee}" />
+
                                             <div class="coupon">
                                                 <div class="coupon-left">
                                                     <img alt="Astatine logo" height="40" src="assets/img/logo.png" width="40" />
@@ -339,347 +363,356 @@ Author     : Tran Quoc Thai - CE181618
                                                         <span>${transport.transportName}</span>
                                                     </div>
                                                     <div style="font-size: 13px; color: gray">
-                                                        Price: ?
+                                                        Price: ${ship}
                                                     </div>
                                                 </div>
                                                 <div class="coupon-right">
                                                     <div style="background: #00a089; padding: 6px; border-radius: 5px; color: white;">
-                                                        <a href="Checkout?transportId=${transport.transportId}&voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
+                                                        <span onclick="checkout('${transport.transportId}', '${ship}')">Apply</span>
                                                     </div>
                                                 </div>
                                             </div>
+
                                         </c:forEach>
+                                        <input type="hidden" id="transportId" name="fee" value="${firstTransportId}">
                                     </div>
                                 </div>
-                                <div class="dropdown" id="couponDropdown"  style="color:#00a089; padding: 10px 0;">
-                                    <a href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span  style="color:#00a089">Voucher</span>
-                                    </a>
-                                    <c:if test="${not empty discount}">${applied}</c:if>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                            <div class="coupon-dropdown-content"> 
-                                            <%-- Lấy ngày hiện tại trong JSP --%>
-                                            <c:set var="today" value="<%= LocalDate.now().toString()%>" />
-                                            <c:forEach items="${vouchers}" var="voucher">
-                                                <c:set var="isExpired" value="${voucher.expiry < today}" />
+                            </div>
+                            <style>
+                                .dropdown-menu {
+                                    min-width: 300px;
+                                    padding: 15px;
+                                    max-height: 200px; /* Giảm chiều cao tối đa xuống */
+                                    overflow-y: auto; /* Đổi lại thành auto để chỉ hiện thanh cuộn khi cần */
+                                }
 
-                                                <div class="coupon ${isExpired ? 'disabled' : ''}">
-                                                    <div class="coupon-left">
-                                                        <img alt="Astatine logo" height="40" src="assets/img/logo.png" width="40" />
-                                                    </div>
-                                                    <div class="coupon-mid">
-                                                        <div style="font-weight: 600;color: #00a089;">
-                                                            <span>Get ${voucher.discount}% off your total bill</span>
-                                                        </div>
-                                                        <div style="font-size: 13px; color: gray">
-                                                            Expired: ${voucher.expiry}
-                                                        </div>
-                                                    </div>
-                                                    <div class="coupon-right">
-                                                        <c:choose>
-                                                            <c:when test="${isExpired}">
-                                                                <div class="expired" style="background: gray; padding: 6px; border-radius: 5px; color: white;">
-                                                                    Expired
-                                                                </div>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <div class="expired" style="background: #00a089; padding: 6px; border-radius: 5px; color: white;">
-                                                                    <a href="Checkout?voucherId=${voucher.voucherId}&dis=${voucher.discount}">Apply</a>
-                                                                </div>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                </div>
-                                            </c:forEach> <!-- Đảm bảo có thẻ đóng này -->
-                                        </div>
-                                    </div>
+                                /* Khi có 2 coupon trở lên */
+                                .coupon-dropdown-content:has.coupon:nth-child(2) {
+                                    max-height: 200px; /* Chiều cao cho 2 coupon */
+                                    overflow-y: scroll;
+                                }
+
+                                /* Style cho thanh cuộn */
+                                .dropdown-menu::-webkit-scrollbar {
+                                    width: 8px;
+                                }
+
+                                .dropdown-menu::-webkit-scrollbar-track {
+                                    background: #f1f1f1;
+                                    border-radius: 10px;
+                                }
+
+                                .dropdown-menu::-webkit-scrollbar-thumb {
+                                    background: #00bfa5;
+                                    border-radius: 10px;
+                                    border: 2px solid #f1f1f1;
+                                }
+
+                                .dropdown-menu::-webkit-scrollbar-thumb:hover {
+                                    background: #00a089;
+                                }
+
+                                /* Đảm bảo mỗi coupon có chiều cao cố định */
+                                .coupon {
+                                    height: 80px; /* Hoặc một giá trị phù hợp */
+                                    margin-bottom: 10px;
+                                }
+
+                                .coupon-mid {
+                                    display: flex;
+                                    flex-direction: column;
+                                }
+
+                                .coupon-right a{
+                                    color: white;
+                                }
+
+                                /* Phần CSS còn lại giữ nguyên */
+                                .coupon-dropdown-content .coupon {
+                                    display: flex;
+                                    padding: 10px;
+                                    border: 1px solid #ddd;
+                                    border-radius: 8px;
+                                    background: #fff;
+                                    gap: 8px;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                }
+
+                                .coupon-left {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: start;
+                                    flex: 0 0 auto;
+                                }
+
+                                .coupon-left img {
+                                    border-radius: 4px;
+                                    background-color: #00bfa5;
+                                }
+
+                                .coupon-mid {
+                                    flex-grow: 1;
+                                    padding: 0 15px;
+                                }
+
+                                .coupon-right {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: end
+                                }
+
+                                .coupon-right-numbers span {
+                                    font-weight: bold;
+                                    color: #ff4444;
+                                }
+
+                                .coupon-right .btn-primary {
+                                    padding: 5px 15px;
+                                    font-size: 14px;
+                                }
+
+                                .view-all-coupons {
+                                    display: block;
+                                    text-align: center;
+                                    margin-top: 15px;
+                                    padding: 8px;
+                                    background: #f8f9fa;
+                                    border-radius: 5px;
+                                    text-decoration: none;
+                                    color: #333;
+                                }
+
+                                .view-all-coupons:hover {
+                                    background: #e9ecef;
+                                    text-decoration: none;
+                                }
+
+                                .expired button {
+                                    background-color: #00bfa5;
+                                    color: white;
+                                    border: none;
+                                    padding: 5px 15px;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                }
+
+                                .expired button:hover {
+                                    background-color: #00a089;
+                                }
+
+                                .coupon:hover {
+                                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                    transform: translateY(-1px);
+                                    transition: all 0.2s ease;
+                                }
+                            </style>
+
+                            <div class="order-col">
+                                <div><strong>TOTAL</strong></div>
+                                <div><strong style="display: flex; justify-content: flex-end" class="order-total">$<span id="orderTotal">${totalPrice != 0 ? (totalPrice - discounted + ship) : 0}</span></strong></div>
+                                <span>
+                                    <c:choose>
+                                        <c:when test="${discount != null and discount > 0}">
+                                            -${discount}%
+                                        </c:when>
+                                        <c:otherwise></c:otherwise>
+                                    </c:choose>
+                                </span>
+
+
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function () {
+                                        function updateTotal(shipFee = null, transportId = null) {
+                                            let feeElement = document.querySelector(".fee");
+                                            let feeText = feeElement.innerText.trim();
+                                            let transportInput = document.getElementById("transportId");
+
+                                            // Nếu có shipFee, cập nhật phí vận chuyển và ID phương thức vận chuyển
+                                            if (shipFee !== null) {
+                                                feeElement.innerText = shipFee > 0 ? shipFee.toFixed(2) : "FREE";
+                                                if (transportInput) {
+                                                    transportInput.value = transportId; // Cập nhật giá trị ID vào input hidden
+                                                }
+                                            } else {
+                                                // Nếu không có shipFee mới, lấy giá trị hiện tại của `.fee`
+                                                shipFee = (feeText === "FREE") ? 0 : parseFloat(feeText.replace("$", "")) || 0;
+                                            }
+
+                                            // Lấy totalPrice và discounted từ JSP
+                                            let totalPrice = parseFloat("${totalPrice}") || 0;
+                                            let discounted = parseFloat("${discounted}") || 0;
+
+                                            // Tính lại orderTotal
+                                            let orderTotal = (totalPrice !== 0) ? (totalPrice - discounted + shipFee) : 0;
+
+                                            // Cập nhật tổng đơn hàng
+                                            document.getElementById("orderTotal").innerText = orderTotal.toFixed(2);
+                                        }
+
+                                        // Khi chọn Transport Unit, cập nhật phí vận chuyển và transportId
+                                        window.checkout = function (transportId, shipFee) {
+                                            updateTotal(parseFloat(shipFee), transportId);
+                                        };
+                                        // ✅ Chỉ gọi sau khi DOM đã load xong
+                                        setTimeout(() => {
+                                            checkout("${firstTransportId}", "${firstShip}");
+                                        }, 0);
+                                    });
+
+                                </script>
+
+
+                            </div>
+                            <div class="payment-method">
+                                <div class="input-radio">
+                                    <input type="radio" name="payment" id="payment-1">
+                                    <label for="payment-1">
+                                        <span></span>
+                                        Cash Payment
+                                    </label>
                                 </div>
-
-                                <style>
-                                    .dropdown-menu {
-                                        min-width: 300px;
-                                        padding: 15px;
-                                        max-height: 200px; /* Giảm chiều cao tối đa xuống */
-                                        overflow-y: auto; /* Đổi lại thành auto để chỉ hiện thanh cuộn khi cần */
-                                    }
-
-                                    /* Khi có 2 coupon trở lên */
-                                    .coupon-dropdown-content:has.coupon:nth-child(2) {
-                                        max-height: 200px; /* Chiều cao cho 2 coupon */
-                                        overflow-y: scroll;
-                                    }
-
-                                    /* Style cho thanh cuộn */
-                                    .dropdown-menu::-webkit-scrollbar {
-                                        width: 8px;
-                                    }
-
-                                    .dropdown-menu::-webkit-scrollbar-track {
-                                        background: #f1f1f1;
-                                        border-radius: 10px;
-                                    }
-
-                                    .dropdown-menu::-webkit-scrollbar-thumb {
-                                        background: #00bfa5;
-                                        border-radius: 10px;
-                                        border: 2px solid #f1f1f1;
-                                    }
-
-                                    .dropdown-menu::-webkit-scrollbar-thumb:hover {
-                                        background: #00a089;
-                                    }
-
-                                    /* Đảm bảo mỗi coupon có chiều cao cố định */
-                                    .coupon {
-                                        height: 80px; /* Hoặc một giá trị phù hợp */
-                                        margin-bottom: 10px;
-                                    }
-
-                                    .coupon-mid {
-                                        display: flex;
-                                        flex-direction: column;
-                                    }
-
-                                    .coupon-right a{
-                                        color: white;
-                                    }
-
-                                    /* Phần CSS còn lại giữ nguyên */
-                                    .coupon-dropdown-content .coupon {
-                                        display: flex;
-                                        padding: 10px;
-                                        border: 1px solid #ddd;
-                                        border-radius: 8px;
-                                        background: #fff;
-                                        gap: 8px;
-                                        justify-content: space-between;
-                                        align-items: center;
-                                    }
-
-                                    .coupon-left {
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: start;
-                                        flex: 0 0 auto;
-                                    }
-
-                                    .coupon-left img {
-                                        border-radius: 4px;
-                                        background-color: #00bfa5;
-                                    }
-
-                                    .coupon-mid {
-                                        flex-grow: 1;
-                                        padding: 0 15px;
-                                    }
-
-                                    .coupon-right {
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: end
-                                    }
-
-                                    .coupon-right-numbers span {
-                                        font-weight: bold;
-                                        color: #ff4444;
-                                    }
-
-                                    .coupon-right .btn-primary {
-                                        padding: 5px 15px;
-                                        font-size: 14px;
-                                    }
-
-                                    .view-all-coupons {
-                                        display: block;
-                                        text-align: center;
-                                        margin-top: 15px;
-                                        padding: 8px;
-                                        background: #f8f9fa;
-                                        border-radius: 5px;
-                                        text-decoration: none;
-                                        color: #333;
-                                    }
-
-                                    .view-all-coupons:hover {
-                                        background: #e9ecef;
-                                        text-decoration: none;
-                                    }
-
-                                    .expired button {
-                                        background-color: #00bfa5;
-                                        color: white;
-                                        border: none;
-                                        padding: 5px 15px;
-                                        border-radius: 4px;
-                                        cursor: pointer;
-                                    }
-
-                                    .expired button:hover {
-                                        background-color: #00a089;
-                                    }
-
-                                    .coupon:hover {
-                                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                                        transform: translateY(-1px);
-                                        transition: all 0.2s ease;
-                                    }
-                                </style>
-
-                                <div class="order-col">
-                                    <div><strong>TOTAL</strong></div>
-                                    <div><strong style="display: flex; justify-content: flex-end" class="order-total">$<span id="orderTotal">${totalPrice != 0 ? (totalPrice - discounted + ship) : 0}</span></strong></div>
-                                    <script>
-                                        const total = parseFloat(document.getElementById("orderTotal").innerText);
-                                        document.getElementById("orderTotal").innerText = total.toFixed(2);
-                                    </script>
-                                </div>
-                                <div class="payment-method">
+                                <c:set value="${totalPrice - discounted + ship}" var="totalLast"></c:set>
                                     <div class="input-radio">
-                                        <input type="radio" name="payment" id="payment-1">
-                                        <label for="payment-1">
+                                        <input onchange="handlePaid(10000)" type="radio" name="payment" id="payment-2">
+                                        <label for="payment-2">
                                             <span></span>
-                                            Cash Payment
+                                            Banking Payment
                                         </label>
+                                        <img src="" class="qr-code"/>
+                                        <p class="paid-message"></p>
                                     </div>
-                                    <c:set value="${totalPrice - discounted + ship}" var="totalLast"></c:set>
-                                        <div class="input-radio">
-                                            <input onchange="handlePaid(10000)" type="radio" name="payment" id="payment-2">
-                                            <label for="payment-2">
-                                                <span></span>
-                                                Banking Payment
-                                            </label>
-                                            <img src="" class="qr-code"/>
-                                            <p class="paid-message"></p>
-                                        </div>
 
-                                    </div>                             
-                                    <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast}, '${voucherId}', '${transportId}')" class="primary-btn order-submit">Place order</a>
-                                <div class="modal" id="orderConfirmModal">
-                                    <img src="../assets/img/Gif/groundhog-day.gif" alt="alt" style="width: 100px; height: 100px; margin: auto 0;"/>
-                                    <div class="modal-header" style="border: none; margin: 0;">Are you sure?</div>
-                                    <div class="modal-footer" style="border: none; margin: 0;">
-                                        <button class="btn btn-cancel" id="cancelOrder">Cancel</button>
-                                        <button class="btn btn-ok" id="confirmOrder">OK</button>
+                                </div>                             
+                                <a style="cursor: ${shop.size() > 0 ? 'pointer' : 'not-allowed'};pointer-events: ${shop.size() > 0 ? 'auto' : 'none'};"  onclick="checkSubmitOrder(${totalLast}, '${voucherId}')" class="primary-btn order-submit">Place order</a>
+                            <div class="modal" id="orderConfirmModal">
+                                <img src="../assets/img/Gif/groundhog-day.gif" alt="alt" style="width: 100px; height: 100px; margin: auto 0;"/>
+                                <div class="modal-header" style="border: none; margin: 0;">Are you sure?</div>
+                                <div class="modal-footer" style="border: none; margin: 0;">
+                                    <button class="btn btn-cancel" id="cancelOrder">Cancel</button>
+                                    <button class="btn btn-ok" id="confirmOrder">OK</button>
 
-                                    </div>
                                 </div>
-
                             </div>
-                            <!-- /Order Details -->            
+
                         </div>
-                        <!-- /row -->
+                        <!-- /Order Details -->            
                     </div>
-                    <!-- /container -->
+                    <!-- /row -->
                 </div>
-                <!-- /SECTION -->
+                <!-- /container -->
             </div>
+            <!-- /SECTION -->
         </div>
-
-        <!-- FOOTER -->
-        <footer id="footer">
-            <!-- top footer -->
-            <div class="section">
-                <!-- container -->
-                <div class="container">
-                    <!-- row -->
-                    <div class="row">
-                        <div class="col-md-3 col-xs-6">
-                            <div class="footer">
-                                <h3 class="footer-title">About Us</h3>
-                                <p>Astatine04 specializes in providing high quality badminton products, committed to prestige.</p>
-                                <ul class="footer-links">
-                                    <li><a href="#"><i class="fa fa-map-marker"></i>Can Tho, Viet Nam</a></li>
-                                    <li><a href="#"><i class="fa fa-phone"></i>0912345678</a></li>
-                                    <li><a href="#"><i class="fa fa-envelope-o"></i>Astatine04@info.com</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-xs-6">
-                            <div class="footer">
-                                <h3 class="footer-title">Categories</h3>
-                                <ul class="footer-links">
-                                    <!--<li><a href="#">Hot deals</a></li>-->
-                                    <li><a href="Store?category=Racket">Racquet</a></li>
-                                    <li><a href="Store?category=Shoes">Shoes</a></li>
-                                    <!--<li><a href="#">Apparel</a></li>-->
-                                    <li><a href="Store?category=Accessories">Accessories</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="clearfix visible-xs"></div>
-
-                        <div class="col-md-3 col-xs-6">
-                            <div class="footer">
-                                <h3 class="footer-title">Information</h3>
-                                <ul class="footer-links">
-                                    <li><a href="#">About Us</a></li>
-                                    <li><a href="#">Contact Us</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                    <li><a href="#">Orders and Returns</a></li>
-                                    <li><a href="#">Terms & Conditions</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 col-xs-6">
-                            <div class="footer">
-                                <h3 class="footer-title">Service</h3>
-                                <ul class="footer-links">
-                                    <li><a href="Profile?action=edit">My Account</a></li>
-                                    <li><a href="Checkout">View Cart</a></li>
-                                    <li><a href="#">Wishlist</a></li>
-                                    <li><a href="#">Track My Order</a></li>
-                                    <li><a href="#">Help</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /row -->
-                </div>
-                <!-- /container -->
-            </div>
-            <!-- /top footer -->
-
-            <!-- bottom footer -->
-            <div id="bottom-footer" class="section">
-                <div class="container">
-                    <!-- row -->
-                    <div class="row">
-                        <div class="col-md-12 text-center">
-                            <span class="copyright">
-                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                Copyright &copy;
-                                <script>document.write(new Date().getFullYear());</script> All rights reserved | This
-                                template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a
-                                    href="https://colorlib.com" target="_blank">Astatine04</a>
-                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                            </span>
-                        </div>
-                    </div>
-                    <!-- /row -->
-                </div>
-                <!-- /container -->
-            </div>
-            <!-- /bottom footer -->
-        </footer>
-        <!-- /FOOTER -->
     </div>
 
-    <!-- jQuery Plugins -->
-    <script src="assets/js/JSDefault/jquery.min.js"></script>
-    <script src="assets/js/JSDefault/bootstrap.min.js"></script>
-    <script src="assets/js/JSDefault/slick.min.js"></script>
-    <script src="assets/js/JSDefault/nouislider.min.js"></script>
-    <script src="assets/js/JSDefault/jquery.zoom.min.js"></script>
-    <script src="assets/js/JSDefault/main.js"></script>
-    <script src="assets/js/Voucher/coupon.js"></script>
-    <script src="assets/js/utils/addtocart.js"></script>
-    <script src="assets/js/utils/submitorder.js"></script>
-    <script src="assets/js/utils/notification.js"></script>
-    <!-- ToastyFy -->
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="assets/js/utils/paidonline.js"></script>
+    <!-- FOOTER -->
+    <footer id="footer">
+        <!-- top footer -->
+        <div class="section">
+            <!-- container -->
+            <div class="container">
+                <!-- row -->
+                <div class="row">
+                    <div class="col-md-3 col-xs-6">
+                        <div class="footer">
+                            <h3 class="footer-title">About Us</h3>
+                            <p>Astatine04 specializes in providing high quality badminton products, committed to prestige.</p>
+                            <ul class="footer-links">
+                                <li><a href="#"><i class="fa fa-map-marker"></i>Can Tho, Viet Nam</a></li>
+                                <li><a href="#"><i class="fa fa-phone"></i>0912345678</a></li>
+                                <li><a href="#"><i class="fa fa-envelope-o"></i>Astatine04@info.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="footer">
+                            <h3 class="footer-title">Categories</h3>
+                            <ul class="footer-links">
+                                <!--<li><a href="#">Hot deals</a></li>-->
+                                <li><a href="Store?category=Racket">Racquet</a></li>
+                                <li><a href="Store?category=Shoes">Shoes</a></li>
+                                <!--<li><a href="#">Apparel</a></li>-->
+                                <li><a href="Store?category=Accessories">Accessories</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="clearfix visible-xs"></div>
+
+                    <div class="col-md-3 col-xs-6">
+                        <div class="footer">
+                            <h3 class="footer-title">Information</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Orders and Returns</a></li>
+                                <li><a href="#">Terms & Conditions</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-xs-6">
+                        <div class="footer">
+                            <h3 class="footer-title">Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="Profile?action=edit">My Account</a></li>
+                                <li><a href="Checkout">View Cart</a></li>
+                                <li><a href="#">Wishlist</a></li>
+                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="#">Help</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /row -->
+            </div>
+            <!-- /container -->
+        </div>
+        <!-- /top footer -->
+
+        <!-- bottom footer -->
+        <div id="bottom-footer" class="section">
+            <div class="container">
+                <!-- row -->
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <span class="copyright">
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script> All rights reserved | This
+                            template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a
+                                href="https://colorlib.com" target="_blank">Astatine04</a>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </span>
+                    </div>
+                </div>
+                <!-- /row -->
+            </div>
+            <!-- /container -->
+        </div>
+        <!-- /bottom footer -->
+    </footer>
+    <!-- /FOOTER -->
+</div>
+
+<!-- jQuery Plugins -->
+<script src="assets/js/JSDefault/jquery.min.js"></script>
+<script src="assets/js/JSDefault/bootstrap.min.js"></script>
+<script src="assets/js/JSDefault/slick.min.js"></script>
+<script src="assets/js/JSDefault/nouislider.min.js"></script>
+<script src="assets/js/JSDefault/jquery.zoom.min.js"></script>
+<script src="assets/js/JSDefault/main.js"></script>
+<script src="assets/js/Voucher/coupon.js"></script>
+<script src="assets/js/utils/addtocart.js"></script>
+<script src="assets/js/utils/submitorder.js"></script>
+<script src="assets/js/utils/notification.js"></script>
+<script src="assets/js/utils/transportSubmit.js"></script>
+<script src="assets/js/utils/voucherSubmit.js"></script>
+<!-- ToastyFy -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="assets/js/utils/paidonline.js"></script>
 </body>
 
 </html>

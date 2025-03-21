@@ -28,7 +28,7 @@ function showToast(message, type) {
 let isSuccess = false;
 let intervalId = null;
 
-const handlePaid = (total) => {
+const handlePaid = (total,voucherId,transportId) => {
     const paymentOnline = (amount) => {
         const checkedRadio = document.querySelector('input[name="payment"]:checked');
         const orderSubmit = document.querySelector('.order-submit');
@@ -42,28 +42,45 @@ const handlePaid = (total) => {
             imgQr.style.display = "block";
             orderSubmit.style.pointerEvents = 'none';
 
-            // Xóa interval cũ nếu tồn tại để tránh trùng lặp
+            // Xóa nội dung cũ và thêm message
+            paidMessage.innerHTML = 'Please scan the QR code to pay the order!<br>';
+            paidMessage.style.color = 'red';
+            paidMessage.style.textAlign = 'center';
+
+            // Tạo phần tử hiển thị thời gian
+         
+            let displayTiming = document.createElement('span');
+            paidMessage.appendChild(displayTiming);
+
+            let timeLeft = 20;
+//            let timeTotal = timeLeft + timeReply;
+
+            displayTiming.textContent = `Time remaining: ${timeLeft}s`;
+
+            // Xóa interval cũ nếu tồn tại
             if (intervalId) {
                 clearInterval(intervalId);
             }
 
-            // Chờ 10 giây, sau đó kiểm tra giao dịch mỗi 1 giây
-            setTimeout(() => {
-                intervalId = setInterval(() => {
-                    checkPaid(amount, desc, total);
-                }, 1000);
-            }, 20000);
+            let countdown = setInterval(() => {
+                timeLeft--;
+                displayTiming.textContent = `Time remaining: ${timeLeft}s`;
 
-            paidMessage.innerHTML = 'Please scan the QR code to pay the order!';
-            paidMessage.style.color = 'red';
-            paidMessage.style.textAlign = 'center';
+                if (timeLeft === 0) {
+                    clearInterval(countdown); // Dừng bộ đếm khi hết 17s
+                    intervalId = setInterval(() => {
+                        checkPaid(amount, desc, total,voucherId,transportId);
+                    }, 1000); // Chờ 3s rồi kiểm tra
+                }
+            }, 1000);
+
         } else {
             // Dừng kiểm tra API nếu không chọn payment-2
             if (intervalId) {
                 clearInterval(intervalId);
-                intervalId = null; // Đặt lại intervalId để tránh chạy lại
+                intervalId = null;
             }
-            isSuccess = false; // Reset trạng thái để có thể chạy lại nếu chọn payment-2 sau đó
+            isSuccess = false;
 
             imgQr.src = "";
             imgQr.style.display = "none";
@@ -82,7 +99,8 @@ const handlePaid = (total) => {
     });
 };
 
-const checkPaid = async (price, content, total) => {
+
+const checkPaid = async (price, content, total,voucherId,transportId) => {
     if (isSuccess) {
         if (intervalId)
             clearInterval(intervalId);
@@ -101,8 +119,8 @@ const checkPaid = async (price, content, total) => {
             console.warn("API bị giới hạn, đợi 30 giây trước khi thử lại...");
             clearInterval(intervalId); // Dừng kiểm tra để tránh spam API
             setTimeout(() => {
-                intervalId = setInterval(() => checkPaid(price, content, total), 1000); // Kiểm tra lại sau 30 giây
-            }, 10000);
+                intervalId = setInterval(() => checkPaid(price, content, total), 3000); // Kiểm tra lại sau 30 giây
+            }, 5000);
             return;
         }
 
@@ -118,8 +136,9 @@ const checkPaid = async (price, content, total) => {
 
             // Kiểm tra nếu thanh toán thành công
             if (pricePaided >= price && descPaided.includes(content)) {
+                const bank = 'Banking Payment'
                 console.log("Thanh toán thành công!");
-                window.location.href = `Orders?total=${total}`;
+                window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}&paymen=${bank}`;
                 isSuccess = true;
             }
         }
