@@ -109,6 +109,22 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+    public Order(int orderId, int userId, String customerName, Double totalPrice, String street, String ward, String district, String city, String email, String phone, Date orderDate, String status) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.street = street;
+        this.ward = ward;
+        this.district = district;
+        this.city = city;
+        this.email = email;
+        this.phone = phone;
+        this.orderDate = orderDate;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.customerName = customerName;
+    }
+
+    
 
     public String getPayment() {
         return payment;

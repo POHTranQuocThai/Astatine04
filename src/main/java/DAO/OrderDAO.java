@@ -37,18 +37,20 @@ public class OrderDAO extends DBContext {
 
     }
 
-//    private int getNextOrderDetailId() throws SQLException {
-//        String sql = "SELECT ISNULL(MAX(Order_Detail_Id), 0) + 1 FROM Order_Details";
-//        try ( ResultSet rs = execSelectQuery(sql)) {
-//            if (rs.next()) {
-//                return rs.getInt(1);
-//            }
-//        }
-//    }
+    private int getNextOrder() throws SQLException {
+        String sql = "SELECT ISNULL(MAX(Order_Id), 0) + 1 FROM Orders";
+        try ( ResultSet rs = execSelectQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
     public int saveCartToDatabase(int customerId, CartDAO cDAO) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-        String sqlNextId = "SELECT ISNULL(MAX(Order_Id), 0) + 1 as nextId FROM Orders";
+
         String insertOrderSql = "INSERT INTO Orders (Order_Id, Customer_Id, Order_Date, Total_Price, Status) VALUES (?, ?, GETDATE(), 0, 'Pending')";
         String insertOrderDetail = "INSERT INTO Order_Details (Order_Detail_Id, Product_Id, Order_Id, Quantity, Price) VALUES (?, ?,?,?, ?)";
         String updateOrderDetail = "UPDATE od\n"
@@ -69,11 +71,7 @@ public class OrderDAO extends DBContext {
         }
 
         if (nextId == -1) {
-            try ( ResultSet rs = execSelectQuery(sqlNextId)) {
-                if (rs.next()) {
-                    nextId = rs.getInt("nextId");
-                }
-            }
+            nextId = getNextOrder();
             execQuery(insertOrderSql, new Object[]{
                 nextId,
                 customerId
@@ -120,10 +118,16 @@ public class OrderDAO extends DBContext {
     public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport, String payment) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-
-        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ? WHERE Customer_Id = ?";
+        int orderId = 0;
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ? WHERE Customer_Id = ? and Status = 'Pending'";
 
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
+        String sqlNextId = "SELECT ISNULL(MAX(Order_Id), 0) as nextId FROM Orders";
+//        try ( ResultSet rs = execSelectQuery(sqlNextId)) {
+//            if (rs.next()) {
+//                orderId = rs.getInt(1);
+//            }
+//        }
         Object[] params = {
             order.getStreet(),
             order.getWard(),
@@ -137,8 +141,7 @@ public class OrderDAO extends DBContext {
             order.getTotalPrice(),
             order.getEmail(),
             payment,
-            userId
-        };
+            userId,};
         try {
             for (Order cartOrder : cDAO.getProductsInCart(userId)) {
                 Products prod = pDAO.getProductById(cartOrder.getProductId());
@@ -187,12 +190,12 @@ public class OrderDAO extends DBContext {
         ArrayList<Products> prod = new ArrayList<>();
         String sql = "SELECT p.*, cat.Category_Name ,b.Brand_Name, o.Quantity, os.Status\n"
                 + "FROM Products p\n"
-                + "				JOIN Brands b ON p.Brand_Id = b.Brand_ID\n"
-                + "				JOIN Order_Details o ON o.Product_ID = p.Product_ID\n"
-                + "				JOIN Orders os ON os.Order_Id = o.Order_Id\n"
-                + "				JOIN Customers c ON c.Customer_ID = os.Customer_Id\n"
-                + "				JOIN Categories cat ON p.Category_Id = cat.Category_Id\n"
-                + "				WHERE c.Customer_ID = ? and os.Status = 'Pending'";
+                + "JOIN Brands b ON p.Brand_Id = b.Brand_ID\n"
+                + "JOIN Order_Details o ON o.Product_ID = p.Product_ID\n"
+                + "JOIN Orders os ON os.Order_Id = o.Order_Id\n"
+                + "JOIN Customers c ON c.Customer_ID = os.Customer_Id\n"
+                + "JOIN Categories cat ON p.Category_Id = cat.Category_Id\n"
+                + "WHERE c.Customer_ID = ? and os.Status = 'Pending'";
         Object[] params = {userId};
 
         try ( ResultSet rs = execSelectQuery(sql, params)) {
@@ -272,13 +275,14 @@ public class OrderDAO extends DBContext {
     //get Order Table
     public ArrayList<Order> getAllOrders() {
         ArrayList<Order> orders = new ArrayList<>();
-        String query = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+        String query = "SELECT o.Order_ID,o.Customer_Id, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
                 + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n";
 
         try ( ResultSet rs = execSelectQuery(query)) {
             while (rs != null && rs.next()) {
                 orders.add(new Order(
                         rs.getInt("Order_ID"),
+                        rs.getInt("Customer_Id"),
                         rs.getString("Customer_Name"),
                         rs.getDouble("Total_Price"),
                         rs.getString("Street"),
@@ -299,7 +303,7 @@ public class OrderDAO extends DBContext {
 
     //Admin
     public Order getOrderByOrderId(int orderId) {
-        String sql = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+        String sql = "SELECT o.Order_ID, o.Customer_Id, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
                 + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
                 + "WHERE o.Order_ID = ?";
 
@@ -308,6 +312,7 @@ public class OrderDAO extends DBContext {
             if (rs.next()) {
                 return new Order(
                         rs.getInt("Order_ID"),
+                        rs.getInt("Customer_Id"),
                         rs.getString("Customer_Name"),
                         rs.getDouble("Total_Price"),
                         rs.getString("Street"),
@@ -327,7 +332,7 @@ public class OrderDAO extends DBContext {
 
     // Returns a list of orders by email
     public List<Order> getOrderByEmail(String email) {
-        String sql = "SELECT o.Order_ID, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
+        String sql = "SELECT o.Order_ID, o.Customer_Id, c.Customer_Name, o.Email, o.Phone, o.Total_Price, o.Street, o.Ward, o.District, o.City, o.Order_Date, o.Status FROM Orders o \n"
                 + "JOIN Customers c ON o.Customer_ID = c.Customer_ID \n"
                 + "WHERE o.Email = ?";
         Object[] params = {email};
@@ -337,6 +342,7 @@ public class OrderDAO extends DBContext {
             while (rs.next()) {
                 Order order = new Order(
                         rs.getInt("Order_ID"),
+                        rs.getInt("Customer_Id"),
                         rs.getString("Customer_Name"),
                         rs.getDouble("Total_Price"),
                         rs.getString("Street"),
@@ -356,7 +362,6 @@ public class OrderDAO extends DBContext {
         }
         return orderList; // Return the list of orders
     }
-
 
     public Order getBill(int orderId, int customerID) throws SQLException {
         String query = "SELECT \n"
@@ -446,4 +451,3 @@ public class OrderDAO extends DBContext {
         return orders;
     }
 }
-        
