@@ -1,5 +1,5 @@
-
 package model;
+
 /**
  *
  * @author Tran Quoc Thai - CE181618
@@ -17,8 +17,15 @@ public class Products {
     private String description;
     private int quanOrder;
     private String status = "Pending";
+    private int amount;
 
     public Products() {
+    }
+
+    public Products(String productName, double price, int amount) {
+        this.productName = productName;
+        this.price = price;
+        this.amount = amount;
     }
 
     public Products(int productId, String productName, int countInStock, int selled, double price, String image, String description, String type, String brand) {
@@ -33,7 +40,7 @@ public class Products {
         this.description = description;
     }
 
-    public Products(int productId, String productName, int countInStock, int selled, double price, String image, String description,  String type, String brand, int quanOrder) {
+    public Products(int productId, String productName, int countInStock, int selled, double price, String image, String description, String type, String brand, int quanOrder) {
         this.productId = productId;
         this.productName = productName;
         this.type = type;
@@ -134,5 +141,11 @@ public class Products {
         this.status = status;
     }
 
-}
+    public int getAmount() {
+        return amount;
+    }
 
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+}

@@ -326,7 +326,7 @@ Author     : Tran Quoc Thai - CE181618
                                     <span  style="color:#00a089">Transport Unit</span>
                                 </a>
                                 <c:if test="${not empty transport}">${applied}</c:if>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="top: 12%">
                                         <div class="coupon-dropdown-content"> 
                                         <%-- Lấy ngày hiện tại trong JSP --%>
                                         <c:forEach items="${transport}" var="transport">
