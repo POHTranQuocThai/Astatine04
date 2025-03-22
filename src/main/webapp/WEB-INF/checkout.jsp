@@ -303,8 +303,10 @@ Author     : Tran Quoc Thai - CE181618
                                 <a href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span  style="color:#00a089">Voucher</span>
                                 </a>
+
                                 <c:if test="${not empty discount}">${applied}</c:if>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
                                         <div class="coupon-dropdown-content"> 
                                         <%-- Lấy ngày hiện tại trong JSP --%>
                                         <c:set var="today" value="<%= LocalDate.now().toString()%>" />

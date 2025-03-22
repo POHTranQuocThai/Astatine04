@@ -104,6 +104,7 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+
     public String getPayment() {
         return payment;
     }

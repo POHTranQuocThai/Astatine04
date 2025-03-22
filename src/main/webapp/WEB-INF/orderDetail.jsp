@@ -4,6 +4,8 @@
     Author     : Ma Tan Loc - CE181795
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -34,16 +36,16 @@
                 </div>
                 <div class="invoice-info">
                     <p>Date</p>
-                    <p class="date">April 26, 2023</p>
+                    <p class="date">${Bill.orderDate}</p>
                     <p>Invoice #</p>
-                    <p class="invoice-number">BRA-00335</p>
+                    <p class="invoice-number">BRA-00${Bill.orderId}</p>
                 </div>
             </div>
             <div class="company-info">
                 <div class="customer">
-                    <p><strong>Nguyen Van A</strong></p>
-                    <p>Phone Number: 0995961151</p>
-                    <p>Address: 124 Xo viet Nghe Tinh, Quan 1, Ho Chi Minh, Vietnam</p>
+                    <p><strong>${Bill.customerName}</strong></p>
+                    <p>Phone Number: ${Bill.phone}</p>
+                    <p>Address: ${Bill.street}, ${Bill.ward}, ${Bill.district}, ${Bill.city}, ${Bill.country}</p>
                 </div>
                 <div style="clear: both;"></div>
             </div>
@@ -58,39 +60,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1.</td>
-                        <td>Montly accounting services</td>
-                        <td>$150.00</td>
-                        <td>1</td>
-                        <td>$150.00</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Taxation consulting (hour)</td>
-                        <td>$60.00</td>
-                        <td>2</td>
-                        <td>$120.00</td>
-                    </tr>
-                    <tr>
-                        <td>3.</td>
-                        <td>Bookkeeping services</td>
-                        <td>$50.00</td>
-                        <td>1</td>
-                        <td>$50.00</td>
-                    </tr>
+                    <c:set var="total" value="0"></c:set>
+                    <c:forEach items="${listProd}" var="list" varStatus="status">
+                        <tr>
+                            <td>${status.index + 1}.</td>
+                            <td>${list.productName}</td>
+                            <td><fmt:formatNumber value="${list.price}" pattern="#,###" /> VND</td>
+                            <td>${list.amount}</td>
+                            <td><fmt:formatNumber value="${list.price * list.amount}" pattern="#,###" /> VND</td>
+                        </tr>
+                        <c:set var="total" value="${list.price * list.amount + total}"></c:set>
+                    </c:forEach>
                 </tbody>
             </table>
             <div class="totals">
-                <p>Total: <strong>$320.00</strong></p>
-                <p>Shipping: <strong>$64.00</strong></p>
-                <p>Voucher: <strong>20%</strong></p>
-                <p class="total">Total: $384.00</p>
+                <p>Total: <strong><fmt:formatNumber value="${total}" pattern="#,###" /> VND</strong></p>
+                <p>Shipping: <strong>${Bill.shipping}</strong></p>
+                <p>Voucher: <strong><fmt:formatNumber value="${Bill.discount}" pattern="#,###" />%</strong></p>
+                <p class="total">Total: <fmt:formatNumber value="${Bill.totalPrice}" pattern="#,###" /> VND</p>
             </div>
             <div class="payment-details">
                 <p><strong>PAYMENT DETAILS</strong></p>
-                <p>Banking or Cash</p>
-                <p>Payment Reference: BRA-00335</p>
+                <p>${Bill.payment}</p>
+            </div>
+            <div class="payment-details transport">
+                <p><strong>TRANSPORTS</strong></p>
+                <p>${Bill.transportName}</p>
             </div>
             <div class="footer">
                 <p>Astatine04 | Astatine04@info.com </p>

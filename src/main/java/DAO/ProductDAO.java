@@ -893,4 +893,30 @@ public class ProductDAO extends DBContext {
         }
         return prod; // Trả về danh sách sản phẩm bán chạy
     }
+    
+     public ArrayList<Products> getInfoBill(int userId, int orderId) {
+        ArrayList<Products> prod = new ArrayList<>();
+        String query = "SELECT \n"
+                + "    p.Product_Name,\n"
+                + "    od.Price,\n"
+                + "    od.Quantity\n"
+                + "FROM Order_Details od\n"
+                + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
+                + "JOIN Orders o ON od.Order_Id = o.Order_Id\n"
+                + "WHERE o.Order_Id = ? \n"
+                + "    AND o.Customer_Id = ? AND o.Status ='Ordered';";
+        Object[] params = {orderId, userId};
+        try ( ResultSet rs = execSelectQuery(query, params)) {
+            while (rs != null && rs.next()) {
+                prod.add(new Products(
+                        rs.getString("Product_Name"),
+                        rs.getDouble("Price"),
+                        rs.getInt("Quantity")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Ghi lại lỗi nếu có
+        }
+        return prod;
+    }
 }
