@@ -10,18 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import model.Cart;
 import model.Order;
 import model.Products;
-import model.User;
 
 /**
  *
@@ -388,7 +380,8 @@ public class OrderDAO extends DBContext {
                 + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
                 + "LEFT JOIN Vouchers v ON o.Voucher_Id = v.Voucher_Id \n"
                 + "LEFT JOIN Transports t ON o.Transport_Id = t.Transport_Id\n"
-                + "WHERE o.Order_Id = ? AND o.Customer_Id = ? AND o.Status = 'Ordered';";
+                + "WHERE o.Order_Id = ? AND o.Customer_Id = ?; ";
+
         Object[] params = {orderId, customerID};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             if (rs.next()) {
