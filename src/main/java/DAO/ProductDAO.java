@@ -904,7 +904,7 @@ public class ProductDAO extends DBContext {
                 + "JOIN Products p ON od.Product_Id = p.Product_Id\n"
                 + "JOIN Orders o ON od.Order_Id = o.Order_Id\n"
                 + "WHERE o.Order_Id = ? \n"
-                + "    AND o.Customer_Id = ? AND o.Status ='Ordered';";
+                + "    AND o.Customer_Id = ?";
         Object[] params = {orderId, userId};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             while (rs != null && rs.next()) {
