@@ -107,11 +107,13 @@ public class OrderDAO extends DBContext {
         return rowsAffected;
     }
 
-    public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport, String payment) throws SQLException {
+    public int orderedSuccess(int userId, Order order, CartDAO cDAO, String voucher, String transport, String payment, String shipP) throws SQLException {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
-        int orderId = 0;
-        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ? WHERE Customer_Id = ? and Status = 'Pending'";
+
+
+        String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ?,Transport_Cost = ? WHERE Customer_Id = ? and Status = 'Pending'";
+
 
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
         String sqlNextId = "SELECT ISNULL(MAX(Order_Id), 0) as nextId FROM Orders";
@@ -133,7 +135,11 @@ public class OrderDAO extends DBContext {
             order.getTotalPrice(),
             order.getEmail(),
             payment,
-            userId,};
+
+            shipP != "" ? Double.parseDouble(shipP) : null,
+            userId
+        };
+
         try {
             for (Order cartOrder : cDAO.getProductsInCart(userId)) {
                 Products prod = pDAO.getProductById(cartOrder.getProductId());
@@ -366,7 +372,8 @@ public class OrderDAO extends DBContext {
                 + "    o.Total_Price,\n"
                 + "    o.Payment,\n"
                 + "    v.Discount,\n"
-                + "	t.Transport_Name\n"
+                + "	t.Transport_Name,\n"
+                + "	o.Transport_Cost\n"
                 + "FROM Orders o\n"
                 + "JOIN Customers c ON o.Customer_Id = c.Customer_Id\n"
                 + "JOIN Order_Details od ON o.Order_Id = od.Order_Id\n"
@@ -374,6 +381,7 @@ public class OrderDAO extends DBContext {
                 + "LEFT JOIN Vouchers v ON o.Voucher_Id = v.Voucher_Id \n"
                 + "LEFT JOIN Transports t ON o.Transport_Id = t.Transport_Id\n"
                 + "WHERE o.Order_Id = ? AND o.Customer_Id = ?; ";
+
         Object[] params = {orderId, customerID};
         try ( ResultSet rs = execSelectQuery(query, params)) {
             if (rs.next()) {
@@ -392,7 +400,7 @@ public class OrderDAO extends DBContext {
                         rs.getString("Payment"), // Country
                         rs.getDouble("Discount"), // Email
                         rs.getString("Transport_Name"), // Phone
-                        0.0
+                        rs.getDouble("Transport_Cost")
                 );
             }
         } catch (Exception e) {
