@@ -48,6 +48,7 @@ public class LoginServlet extends HttpServlet {
             if (user == null) {
                 try {
                     User newUser = new User();
+                    newUser.setFullname(googlePojo.getId());
                     newUser.setFullname(googlePojo.getName());
                     newUser.setEmail(googlePojo.getEmail());
                     newUser.setPassword("");
@@ -61,6 +62,9 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("User", user);
                     session.setAttribute("email", user.getEmail());
                     session.setAttribute("isAdmin", user.isIsAdmin());
+                    session.setAttribute("userId", user.getUserId());
+                    System.out.println("UserID stored in session: " + session.getAttribute("userId"));
+
                     response.sendRedirect("Home");
                 } catch (SQLException ex) {
                     Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,6 +117,9 @@ public class LoginServlet extends HttpServlet {
                 user.setIsAdmin(uDAO.checkIsAdmin(email));
                 HttpSession session = request.getSession();
                 user = uDAO.getUserByEmail(email);
+
+                session.setAttribute("userId", user.getUserId());
+                System.out.println("UserID stored in session: " + session.getAttribute("userId"));
                 session.setAttribute("email", user.getEmail());
                 session.setAttribute("User", user);
                 session.setAttribute("isAdmin", user.isIsAdmin());

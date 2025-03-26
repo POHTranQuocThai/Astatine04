@@ -62,65 +62,28 @@ public class adProductServlet extends HttpServlet {
         }
 
         if ("list".equals(action)) {
-            int count = pDAO.getNumberPageAd();
-            int endPage = count / 6;
-            if (count % 6 != 0) {
-                endPage++;
-            }
-
-            int maxPagesToShow = 6;
-            int startPage, endPageLimit;
-
-            if (index <= maxPagesToShow / 2) {
-                startPage = 1;
-                endPageLimit = Math.min(maxPagesToShow, endPage);
-            } else if (index > endPage - maxPagesToShow / 2) {
-                startPage = Math.max(1, endPage - maxPagesToShow + 1);
-                endPageLimit = endPage;
-            } else {
-                startPage = index - maxPagesToShow / 2;
-                endPageLimit = startPage + maxPagesToShow - 1;
-            }
-
-            List<Products> list = null;
-            try {
-                list = pDAO.getPagingAd(index);
-            } catch (SQLException ex) {
-                Logger.getLogger(adProductServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
             List<Products> products = pDAO.getAll();
-
-            request.setAttribute("listPr", list);
-            request.setAttribute("endP", endPage);
-            request.setAttribute("startPage", startPage);
-            request.setAttribute("endPageLimit", endPageLimit);
-            request.setAttribute("currentPage", index);
-
+            request.setAttribute("listPr", products);
             request.getRequestDispatcher("/WEB-INF/adListProduct.jsp").forward(request, response);
             return;
         }
 
-        // Kiểm tra trường hợp ID không hợp lệ hoặc không tồn tại
         Products product = null;
         if (idParam != null && !idParam.isEmpty()) {
             try {
                 int id = Integer.parseInt(idParam);
                 product = pDAO.getProductById(id);
             } catch (NumberFormatException e) {
-                // ID không phải là số, chuyển hướng về danh sách
                 response.sendRedirect("Product?action=list");
                 return;
             }
         }
 
-        // Nếu product là null, chuyển hướng về danh sách sản phẩm
         if (product == null && !"create".equals(action)) {
             response.sendRedirect("Product?action=list");
             return;
         }
 
-        // Xử lý các hành động khác
         switch (action) {
             case "create":
                 request.getRequestDispatcher("/WEB-INF/adCreateProduct.jsp").forward(request, response);
@@ -163,7 +126,6 @@ public class adProductServlet extends HttpServlet {
             String description = request.getParameter("description");
             String brand = request.getParameter("brand");
 
-            // Lấy đường dẫn của dự án và lưu vào trong img/product/
             String applicationPath = getServletContext().getRealPath("");
             String uploadPath = applicationPath.replace("build\\", "") + "assets\\img\\product";
 
@@ -171,28 +133,27 @@ public class adProductServlet extends HttpServlet {
 
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
-                uploadDir.mkdirs(); // Tạo thư mục nếu chưa tồn tại
+                uploadDir.mkdirs();
             }
 
-            // Xử lý nhiều ảnh và nối đường dẫn bằng dấu phẩy
             StringBuilder imagePaths = new StringBuilder();
             for (Part filePart : request.getParts()) {
-                if (filePart.getName().equals("image") && filePart.getSize() > 0) { // Kiểm tra part là hình ảnh
-                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // Lấy tên file
-                    filePart.write(uploadPath + File.separator + fileName); // Tiến hành lưu file
+                if (filePart.getName().equals("image") && filePart.getSize() > 0) {
+                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    filePart.write(uploadPath + File.separator + fileName);
 
                     if (imagePaths.length() > 0) {
-                        imagePaths.append(","); // Thêm dấu phẩy nếu đã có ảnh trước đó
+                        imagePaths.append(",");
                     }
-                    imagePaths.append("assets\\img\\product\\").append(fileName); // Lưu đường dẫn ảnh
+                    imagePaths.append("assets\\img\\product\\").append(fileName);
                 }
             }
-            // Tạo product với chuỗi đường dẫn ảnh
 
             Products product = new Products(0, productName, countInStock, selled, price, imagePaths.toString(), description, type, brand);
             int result = pDAO.createProduct(product);
             if (result > 0) {
-                response.sendRedirect("Product?action=list");  // Thành công
+                request.setAttribute("message", "Sản phẩm đã được thêm thành công!");
+                response.sendRedirect("Product?action=list");
             } else {
                 request.setAttribute("error", "Failed to create product.");
                 request.getRequestDispatcher("WEB-INF/adCreateProduct.jsp").forward(request, response);
@@ -211,29 +172,24 @@ public class adProductServlet extends HttpServlet {
                 int selled = Integer.parseInt(request.getParameter("selled"));
                 String description = request.getParameter("description");
 
-                // Retrieve existing product to get current images
                 Products existingProduct = pDAO.getProductById(productId);
-                String currentImages = existingProduct.getImage(); // Existing images from the database
+                String currentImages = existingProduct.getImage();
 
-                // Initialize a variable for the final image paths
                 StringBuilder imagePaths = new StringBuilder();
 
-                // Process new images if uploaded, otherwise keep current images
                 boolean newImagesUploaded = false;
                 for (Part filePart : request.getParts()) {
-                    if (filePart.getName().equals("image") && filePart.getSize() > 0) { // Check if the image part is uploaded
+                    if (filePart.getName().equals("image") && filePart.getSize() > 0) {
                         newImagesUploaded = true;
                         String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
 
-                        // Define upload path
                         String applicationPath = getServletContext().getRealPath("");
                         String uploadPath = applicationPath.replace("build\\", "") + "assets\\img\\product";
                         File uploadDir = new File(uploadPath);
                         if (!uploadDir.exists()) {
-                            uploadDir.mkdirs(); // Create directory if it doesn't exist
+                            uploadDir.mkdirs();
                         }
 
-                        // Save each file and append path to imagePaths
                         filePart.write(uploadPath + File.separator + fileName);
                         if (imagePaths.length() > 0) {
                             imagePaths.append(",");
@@ -242,7 +198,6 @@ public class adProductServlet extends HttpServlet {
                     }
                 }
 
-                // If no new images were uploaded, keep the current images
                 String image = newImagesUploaded ? imagePaths.toString() : currentImages;
                 Products product = new Products(productId, productName, countInStock, selled, price, image, description, type, brand);
                 try {

@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,47 +41,30 @@ public class adUserServelt extends HttpServlet {
 
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
-        String indexPage = request.getParameter("index");
 
-        int index = (indexPage == null || indexPage.isEmpty()) ? 1 : Integer.parseInt(indexPage);
-        request.setAttribute("index", index);
+        HttpSession session = request.getSession();
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+
+        if (currentUserId == null) {
+            String googleId = (String) session.getAttribute("googleId");
+            User currentUser = uDAO.getUserByEmail((String) session.getAttribute("email"));
+
+            if (googleId != null) {
+                currentUserId = Integer.parseInt(googleId);
+            } else if (currentUser != null) {
+                currentUserId = currentUser.getUserId();
+            }
+
+            session.setAttribute("userId", currentUserId);
+        }
+        System.out.println("Current User ID: " + currentUserId);
 
         if (action == null) {
             action = "list";
         }
         if ("list".equals(action)) {
-            int count = uDAO.getNumberPage();
-            int endPage = count / 3;
-            if (count % 3 != 0) {
-                endPage++;
-            }
-
-            int maxPagesToShow = 6;
-            int startPage, endPageLimit;
-
-            if (index <= maxPagesToShow / 2) {
-                startPage = 1;
-                endPageLimit = Math.min(maxPagesToShow, endPage);
-            } else if (index > endPage - maxPagesToShow / 2) {
-                startPage = Math.max(1, endPage - maxPagesToShow + 1);
-                endPageLimit = endPage;
-            } else {
-                startPage = index - maxPagesToShow / 2;
-                endPageLimit = startPage + maxPagesToShow - 1;
-            }
-
-            List<User> list = null;
-            try {
-                list = uDAO.getPagingAd(index);
-            } catch (SQLException ex) {
-                Logger.getLogger(adUserServelt.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            request.setAttribute("listPr", list);
-            request.setAttribute("endP", endPage);
-            request.setAttribute("startPage", startPage);
-            request.setAttribute("endPageLimit", endPageLimit);
-            request.setAttribute("currentPage", index);
-
+            List<User> user = uDAO.getAllExcept(currentUserId);
+            request.setAttribute("listPr", user);
             request.getRequestDispatcher("/WEB-INF/adListUser.jsp").forward(request, response);
         }
 
@@ -127,28 +111,43 @@ public class adUserServelt extends HttpServlet {
         int id = Integer.parseInt(idParam);
 
         if (action.equals("edit")) {
-
-            int userId = id;
-            String fullname = request.getParameter("fullname");
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            String phone = request.getParameter("phone");
-            boolean isAdmin = request.getParameter("isAdmin") != null;
-            String street = request.getParameter("street");
-            String ward = request.getParameter("ward");
-            String district = request.getParameter("district");
-            String city = request.getParameter("city");
-            String country = request.getParameter("country");
-
-            User user = new User(userId, fullname, email, password, phone, street, ward, district, city, country, isAdmin);
-
             try {
-                uDAO.updateUser(user);
-            } catch (SQLException ex) {
-                Logger.getLogger(adUserServelt.class.getName()).log(Level.SEVERE, null, ex);
+                int userId = id;
+                String fullname = request.getParameter("fullname");
+                String email = request.getParameter("email");
+                String password = request.getParameter("password");
+                String phone = request.getParameter("phone");
+                boolean isAdmin = request.getParameter("isAdmin") != null;
+                String street = request.getParameter("street");
+                String ward = request.getParameter("ward");
+                String district = request.getParameter("district");
+                String city = request.getParameter("city");
+                String country = request.getParameter("country");
+
+                System.out.println("🔹 Dữ liệu nhận được:");
+                System.out.println("userId: " + userId);
+                System.out.println("fullname: " + fullname);
+                System.out.println("email: " + email);
+
+                User user = new User(userId, fullname, email, password, phone, street, ward, district, city, country, isAdmin);
+
+                try {
+                    uDAO.updateUser(user);
+                    System.out.println("Cập nhật user thành công!");
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write(new Gson().toJson(user));
+                } catch (SQLException ex) {
+                    System.out.println("Lỗi SQL: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+
+                request.setAttribute("user", user);
+                response.sendRedirect("User?action=list");
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.getWriter().write("error");
             }
-            request.setAttribute("user", user);
-            response.sendRedirect("User?action=list");
         }
         if (action.equals("delete")) {
             uDAO.deleteUser(id);

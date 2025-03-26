@@ -264,7 +264,7 @@
                         <div>
 
                             <h3 class="product-price"><fmt:formatNumber value="${prodDetails.price}" pattern="#,###" /> VNĐ</h3>
-                            <span class="product-available">In Stock ${prodDetails.countInStock}</span>
+                            <span class="product-available">Stock:   ${prodDetails.countInStock}</span>
                         </div>
 
                         <div class="add-to-cart">                           
@@ -281,7 +281,12 @@
 
                         <ul class="product-links">
                             <li>Category:</li>
-                            <li><a href="#">${prodDetails.type}</a></li>                         
+                            <li><a href="Store?category=${prodDetails.type}">${prodDetails.type}</a></li>                         
+                        </ul>
+
+                        <ul class="product-links">
+                            <li>Brand:</li>
+                            <li><a href="tore?brand=${prodDetails.brand}">${prodDetails.brand}</a></li>                         
                         </ul>
 
                         <div class="preferential">PREFERENTIAL</div>
@@ -348,10 +353,12 @@
                         </div>
                         <!-- /tab1 -->
                         <style>
+                            .avatar img {
+                                width: 30px;
+                            }
                             .warranty-info {
                                 display: none;
-                            }
-
+                            }   
                             .comment-box {
                                 width: 100%;
                                 background: #fff;
@@ -398,12 +405,12 @@
                             }
                             .comment {
                                 display: flex;
+                                flex-direction: column;
                                 align-items: flex-start;
                                 gap: 10px;
                                 background: #f8f9fa;
                                 padding: 10px;
                                 border-radius: 10px;
-                                margin-top: 10px;
                             }
                             .comment .avatar {
                                 min-width: 40px;
@@ -557,12 +564,26 @@
                                 commentDiv.dataset.commentId = commentId;
                                 commentDiv.dataset.userId = userId;
 
+                                var containerDiv = document.createElement("div");
+                                containerDiv.classList.add("container-comment");
+
                                 var avatarDiv = document.createElement("div");
                                 avatarDiv.classList.add("avatar");
-                                avatarDiv.textContent = "👤";
+
+                                var avatarImg = document.createElement("img");
+                                avatarImg.src = "assets/img/default-avatar.png";
+                                avatarImg.alt = "Avatar";
+
+                                avatarDiv.appendChild(avatarImg);
 
                                 var commentWrapper = document.createElement("div");
                                 commentWrapper.classList.add("comment-wrapper");
+
+                                containerDiv.appendChild(avatarDiv);
+                                containerDiv.appendChild(commentWrapper);
+
+                                document.body.appendChild(containerDiv);
+
 
                                 var nameDiv = document.createElement("div");
                                 nameDiv.classList.add("comment-name");

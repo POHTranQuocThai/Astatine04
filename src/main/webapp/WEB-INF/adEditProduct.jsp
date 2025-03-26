@@ -28,6 +28,13 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     </head>
+    <c:if test="${not empty requestScope.message}">
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                showToast("${requestScope.message}");
+            });
+        </script>
+    </c:if>
 
     <body>
         <nav id="sidebar">
@@ -153,6 +160,7 @@
     </body>
 
     <!-- JS Link-->
+    <script type="text/javascript" src="../assets/js/Admin/handleSubmit.js" defer></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminJS.js" defer></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminDragDropImage.js" defer></script>
 </html>

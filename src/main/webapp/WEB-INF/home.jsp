@@ -105,8 +105,11 @@
 
                     <div class="col-md-3 clearfix">
                         <div class="header-ctn">
-                            <!-- Cart -->
-                            <div class="dropdown" id="cart-dropdown" onsubmit="this.submit()">
+                            <%
+                                String email = (String) session.getAttribute("email");
+                            %>
+                            <!-- Cart -->“
+                            <div class="dropdown" id="cart-dropdown" onsubmit="this.submit()" style="<%= email != null && !email.isEmpty() ? "display: inline-block" : "display: none;"%>">
                                 <a class="dropdown-toggle" href="Checkout" id="navbarDropdownMenuLink" 
                                    aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-bag-heart-fill" style="font-size: 24px;"></i>
@@ -114,11 +117,8 @@
                                 </a>
                             </div>
                             <!-- /Cart -->
+                            
                             <!-- Account -->   
-                            <%
-                                String email = (String) session.getAttribute("email");
-                            %>
-
                             <div id="account-dropdown" style="<%= email != null && !email.isEmpty() ? "display: none;" : "display: inline-block;"%>">
                                 <a class="dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
                                    aria-haspopup="true" aria-expanded="false" style="display: flex; align-items: center; gap: 20px;">
@@ -320,7 +320,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="product-body">
-                                                            
+
                                                             <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}" target="_self">${prod.productName}</a></h3>
                                                             <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
                                                             <div class="product-btns">
@@ -536,7 +536,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="product-body">
-                                                            
+
                                                             <h3 class="product-name"><a href="Products?view=prod-details&id=${top.productId}" target="_self">${top.productName}</a></h3>
                                                             <h4 class="product-price"><fmt:formatNumber value="${top.price}" pattern="#,###" /> VNĐ</h4>
                                                             <div class="product-btns">

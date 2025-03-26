@@ -83,6 +83,20 @@
             </section>
             <div id="editModal" class="modal-container">
                 <div class="modal-box"> 
+                    <c:if test="${not empty error}">
+                        <div class="alert">
+                            <span class="closebtn">&times;</span>  
+                            <strong>Error!</strong> ${error}
+                        </div>
+                        <c:remove var="error" scope="session"/>
+                    </c:if>
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert success">
+                            <span class="closebtn">&times;</span>  
+                            <strong>Success!</strong> ${successMessage}
+                        </div>
+                        <c:remove var="successMessage" scope="session"/>
+                    </c:if>
                     <h1>Profile Password</h1>
 
                     <div class="form">
@@ -127,25 +141,38 @@
                 </div>
             </div>
         </main>
+        <script>
+            var close = document.getElementsByClassName("closebtn");
+            var i;
 
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function () {
+                    var div = this.parentElement;
+                    div.style.opacity = "0";
+                    setTimeout(function () {
+                        div.style.display = "none";
+                    }, 600);
+                }
+            }
+        </script>
     </body>
 
     <!-- JS Link-->
     <script type="text/javascript" src="./assets/js/JSRemake/adminJS.js" defer></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminDragDropImage.js" defer></script>
     <script>
-                                           function togglePasswordVisibility(inputId, iconId) {
-                                               let passwordInput = document.getElementById(inputId);
-                                               let eyeIcon = document.getElementById(iconId);
+    function togglePasswordVisibility(inputId, iconId) {
+        let passwordInput = document.getElementById(inputId);
+        let eyeIcon = document.getElementById(iconId);
 
-                                               if (passwordInput.type === "password") {
-                                                   passwordInput.type = "text";
-                                                   eyeIcon.className = "bi bi-eye-fill"; // Sửa class
-                                               } else {
-                                                   passwordInput.type = "password";
-                                                   eyeIcon.className = "bi bi-eye-slash-fill"; // Sửa class
-                                               }
-                                           }
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.className = "bi bi-eye-fill"; // Sửa class
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.className = "bi bi-eye-slash-fill"; // Sửa class
+        }
+    }
     </script>
 
 </html>

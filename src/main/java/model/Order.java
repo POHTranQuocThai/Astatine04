@@ -33,6 +33,23 @@ public class Order {
     private Double discount;
     private String transportName;
 
+    public Order(int orderId, int userId, String customerName, Double totalPrice, String street, String ward, String district, String city, String email, String phone, Date orderDate, String status) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.street = street;
+        this.ward = ward;
+        this.district = district;
+        this.city = city;
+        this.email = email;
+        this.phone = phone;
+        this.orderDate = orderDate;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.customerName = customerName;
+    }
+
+    
+    
     public Order(int orderId, String email, String customerName, String phone, String street, String ward, String district, String city, String country, Date orderDate, Double totalPrice, String payment, Double discount, String transportName, Double shippingFee) {
         this.orderId = orderId;
         this.street = street;

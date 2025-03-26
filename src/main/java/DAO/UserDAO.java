@@ -197,6 +197,42 @@ public class UserDAO extends DBContext {
         return user; // Trả về danh sách các sản phẩm
     }
 
+    public ArrayList<User> getAllExcept(int currentUserId) {
+        ArrayList<User> users = new ArrayList<>();
+        String query = "SELECT * FROM Customers WHERE Customer_ID <> ?";
+        ResultSet rs = null;
+
+        try {
+            rs = execSelectQuery(query, new Object[]{currentUserId}); // Gọi execSelectQuery từ DBContext
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getInt(1), // ID
+                        rs.getString(2), // Name
+                        rs.getString(3), // Street
+                        rs.getString(4), // Ward
+                        rs.getString(5), // District
+                        rs.getString(6), // City
+                        rs.getString(7), // Country
+                        rs.getString(8), // Password (encrypt)
+                        rs.getString(9), // Email
+                        rs.getString(10), // Contacts
+                        rs.getBoolean(11) // Check Admin (T/F)
+                ));
+            }
+        } catch (SQLException e) {
+            // Xử lý lỗi nếu có
+            
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close(); // Đóng ResultSet nếu tồn tại
+                }
+            } catch (SQLException ex) {
+            }
+        }
+        return users; // Trả về danh sách người dùng
+    }
+
     // Retrieve a user by ID
     public User getUserById(int id) {
         User user = null;
