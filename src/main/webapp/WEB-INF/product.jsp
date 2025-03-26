@@ -678,6 +678,77 @@
         <!-- row -->
         <div class="row">
 
+            <!-- Phần chèn 5 video YouTube -->
+            <div style="padding: 20px 0;">
+                <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+                    <div style="display: flex; flex-wrap: wrap; margin-left: -15px; margin-right: -15px;">
+                        <div style="width: 100%; padding-left: 15px; padding-right: 15px;">
+                            <div style="margin: 20px 0; text-align: center;">
+                                <h3 style="font-size: 24px; margin-bottom: 15px; font-weight: 700; text-transform: uppercase">Badminton racket tips videos</h3>
+                                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <!-- Video 1 -->
+                                    <div style="flex: 1; min-width: 150px; max-width: 200px; text-align: center;">
+                                        <a href="https://www.youtube.com/watch?v=cJr8ihpuiIA" target="_blank">
+                                            <img src="https://img.youtube.com/vi/cJr8ihpuiIA/mqdefault.jpg" 
+                                                 style="width: 100%; height: auto; border-radius: 8px; display: block;" 
+                                                 alt="Video 1 Thumbnail">
+                                            <p style="font-size: 14px; margin: 5px 0 0; color: #333; text-decoration: none; font-weight: bold">
+                                                Racket for beginners
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <!-- Video 2 -->
+                                    <div style="flex: 1; min-width: 150px; max-width: 200px; text-align: center;">
+                                        <a href="https://www.youtube.com/watch?v=IvPnNPs7evA" target="_blank">
+                                            <img src="https://img.youtube.com/vi/IvPnNPs7evA/mqdefault.jpg" 
+                                                 style="width: 100%; height: auto; border-radius: 8px; display: block;" 
+                                                 alt="Video 2 Thumbnail">
+                                            <p style="font-size: 14px; margin: 5px 0 0; color: #333; text-decoration: none; font-weight: bold">
+                                                All About Badminton Rackets 1
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <!-- Video 3 -->
+                                    <div style="flex: 1; min-width: 150px; max-width: 200px; text-align: center;">
+                                        <a href="https://www.youtube.com/watch?v=4_hy-Ns0KPM" target="_blank">
+                                            <img src="https://img.youtube.com/vi/4_hy-Ns0KPM/mqdefault.jpg" 
+                                                 style="width: 100%; height: auto; border-radius: 8px; display: block;" 
+                                                 alt="Video 3 Thumbnail">
+                                            <p style="font-size: 14px; margin: 5px 0 0; color: #333; text-decoration: none; font-weight: bold">
+                                                All About Badminton Rackets 2
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <!-- Video 4 -->
+                                    <div style="flex: 1; min-width: 150px; max-width: 200px; text-align: center;">
+                                        <a href="https://www.youtube.com/watch?v=xuENOlf-Y1A" target="_blank">
+                                            <img src="https://img.youtube.com/vi/xuENOlf-Y1A/mqdefault.jpg" 
+                                                 style="width: 100%; height: auto; border-radius: 8px; display: block;" 
+                                                 alt="Video 4 Thumbnail">
+                                            <p style="font-size: 14px; margin: 5px 0 0; color: #333; text-decoration: none; font-weight: bold">
+                                                Racket Buying Guide
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <!-- Video 5 -->
+                                    <div style="flex: 1; min-width: 150px; max-width: 200px; text-align: center;">
+                                        <a href="https://www.youtube.com/watch?v=6iBjUdbdZ48" target="_blank">
+                                            <img src="https://img.youtube.com/vi/6iBjUdbdZ48/mqdefault.jpg" 
+                                                 style="width: 100%; height: auto; border-radius: 8px; display: block;" 
+                                                 alt="Video 5 Thumbnail">
+                                            <p style="font-size: 14px; margin: 5px 0 0; color: #333; text-decoration: none; font-weight: bold">
+                                                Should You Choose a 3U or 4U Racket?
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Kết thúc chèn video -->
+
             <div class="col-md-12">
                 <div class="section-title text-center">
                     <h3 class="title">Related Products</h3>
@@ -758,11 +829,11 @@
                     <div class="footer">
                         <h3 class="footer-title">Categories</h3>
                         <ul class="footer-links">
-                            <li><a href="#">Hot deals</a></li>
-                            <li><a href="#">Racquet</a></li>
-                            <li><a href="#">Shoes</a></li>
-                            <li><a href="#">Apparel</a></li>
-                            <li><a href="#">Accessories</a></li>
+                            <!--<li><a href="#">Hot deals</a></li>-->
+                            <li><a href="Store?category=Racket">Racquet</a></li>
+                            <li><a href="Store?category=Shoes">Shoes</a></li>
+                            <!--<li><a href="#">Apparel</a></li>-->
+                            <li><a href="Store?category=Accessories">Accessories</a></li>
                         </ul>
                     </div>
                 </div>
