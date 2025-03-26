@@ -387,6 +387,29 @@ main p{
     }
 }
 
+.alert {
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #EE4E4E;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.6s;
+  margin-bottom: 15px;
+}
+
+.alert.success {background-color: #21A691;}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
 /* Responsive for small screens */
 @media(max-width: 800px){
     body{

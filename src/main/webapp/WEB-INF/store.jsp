@@ -396,10 +396,10 @@
                                                         <div class="product-img">
                                                             <c:choose>
                                                                 <c:when test="${not empty prod.image and prod.image != ''}">
-                                                                    <img src="${prod.image}" alt="${prod.productName}" onerror="this.src='assets/img/default-image.jpg';">
+                                                                    <img src="${prod.image}" alt="${prod.productName}" onerror="this.src='assets/img/LogoFB_group.png';">
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <img src="assets/img/default-image.jpg" alt="No image">
+                                                                    <img src="assets/img/LogoFB_group.png" alt="No image">
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </div>
@@ -663,23 +663,26 @@
                         <!-- /bottom footer -->
                     </footer>
                     <!-- /FOOTER -->
+                </div>
+            </div>
+        </div>
+                                        
+        <!-- jQuery Plugins -->
+        <script src="assets/js/JSDefault/jquery.min.js"></script>
+        <script src="assets/js/JSDefault/bootstrap.min.js"></script>
+        <script src="assets/js/JSDefault/slick.min.js"></script>
+        <script src="assets/js/JSDefault/nouislider.min.js"></script>
+        <script src="assets/js/JSDefault/jquery.zoom.min.js"></script>
+        <script src="assets/js/JSDefault/main.js"></script>
+        <script src="assets/js/utils/addtocart.js"></script>
+        <script src="assets/js/utils/notification.js"></script>
+        <!-- ToastyFy -->
+        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-                    <!-- jQuery Plugins -->
-                    <script src="assets/js/JSDefault/jquery.min.js"></script>
-                    <script src="assets/js/JSDefault/bootstrap.min.js"></script>
-                    <script src="assets/js/JSDefault/slick.min.js"></script>
-                    <script src="assets/js/JSDefault/nouislider.min.js"></script>
-                    <script src="assets/js/JSDefault/jquery.zoom.min.js"></script>
-                    <script src="assets/js/JSDefault/main.js"></script>
-                    <script src="assets/js/utils/addtocart.js"></script>
-                    <script src="assets/js/utils/notification.js"></script>
-                    <!-- ToastyFy -->
-                    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script src="assets/js/JSRemake/SlideMoving.js"></script>
 
-                    <script src="assets/js/JSRemake/SlideMoving.js"></script>
+        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
-                    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    </body>
 
-                    </body>
-
-                    </html>
+</html>

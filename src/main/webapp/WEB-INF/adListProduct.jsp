@@ -13,7 +13,7 @@
     <head>
         <jsp:useBean id="a" class="DAO.ProductDAO" scope="request"></jsp:useBean>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 
             <!-- Tittle Web-->
             <title>Astatine 04 - Admin</title>
@@ -149,7 +149,7 @@
                     </tbody>
                 </table>
 
-                <div class="pagination">
+<!--                <div class="pagination">
                     <c:if test="${index > 1}">
                         <a href="Product?index=1" class="pagination-link"><i class='bx bxs-chevrons-left' ></i></a>
                         </c:if>
@@ -168,10 +168,12 @@
                         <c:if test="${index < a.getNumberPageAd()}">
                         <a href="Product?index=${a.getNumberPageAd()}" class="pagination-link"><i class='bx bxs-chevrons-right' ></i></a>
                         </c:if>
-                </div>
+                </div>-->
             </section>
         </main>
     </body>
+    <div id="toast-container"></div>
+
     <!-- JS Link-->
     <script type="text/javascript" src="./assets/js/JSRemake/adminTable.js"></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminDragDropImage.js"></script>

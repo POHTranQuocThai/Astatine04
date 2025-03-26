@@ -212,10 +212,53 @@ textarea.input {
     color: #21A691;
 }
 
+/*-- Pagination --*/
+
+.pagination>li:first-child>a, .pagination>li:first-child>span {
+    margin-left: 0.5rem;
+    border-radius: 1rem;
+}
+.pagination>li:last-child>a, .pagination>li:last-child>span {
+    margin-right: 0.5rem;
+    border-radius: 1rem;
+}
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+    color: #fff;
+    cursor: default;
+    background-color: #21A691;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination .page-link {
+    padding: 1rem 1.6rem;
+    margin: 0 0.5rem;
+    border-radius: 1rem;
+    background-color: #f4f4f4;
+    color: #060D10;
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination .page-link:hover {
+    background-color: #21A691; /* Change background on hover */
+    color: white; /* Change text color on hover */
+}
+
+
+
 /*-- Select input --*/
 
 .input-select {
-    padding: 0px 15px;
+    border-radius: 1rem;
+    padding: 0 0.5rem;
     background: #FFF;
     border: 1px solid #E4E7ED;
     height: 40px;
@@ -1506,6 +1549,12 @@ textarea.input {
     display: none;
 }
 
+.price-filter {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+}
+
 .price-filter .input-number {
     display: inline-block;
     width: calc(50% - 7px);
@@ -1660,8 +1709,6 @@ textarea.input {
 
 #product-imgs {
     max-height: 460px;
-    overflow-y: scroll;
-    scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
@@ -1951,10 +1998,13 @@ textarea.input {
     width: 80px;
     height: auto;
 }
+
 #price-min,#price-max{
-    width: 100px;
+    width: 100%;
     padding: 0;
+    border-radius: 1rem;
 }
+
 .input-number {
     display: flex;
     justify-content: center;
@@ -1962,7 +2012,7 @@ textarea.input {
 }
 
 .input-number input[type="number"] {
-    width: 60px;
+    width: 45%;
     text-align: center;
     margin-right: 5px;
 }

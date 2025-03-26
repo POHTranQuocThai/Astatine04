@@ -49,14 +49,14 @@ public class ProfileServlet extends HttpServlet {
 
             if (user != null) {
                 if ("password".equals(action)) {
-                    request.setAttribute("user", user);
+                    request.getSession().setAttribute("user", user);
                     request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 } else if ("edit".equals(action)) {
-                    request.setAttribute("user", user);
+                    request.getSession().setAttribute("user", user);
                     request.getRequestDispatcher("/WEB-INF/profile.jsp").forward(request, response);
                 } else if ("order".equals(action)) {
                     List<Order> orderList = oDAO.getOrderByEmail(email); // Retrieve list of orders
-                    request.setAttribute("orderList", orderList);
+                    request.getSession().setAttribute("orderList", orderList);
                     request.getRequestDispatcher("/WEB-INF/profileOrder.jsp").forward(request, response);
                 }
             } else {
@@ -87,24 +87,24 @@ public class ProfileServlet extends HttpServlet {
             String confirmPassword = request.getParameter("confirm_password");
 
             if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
-                request.setAttribute("mess", "Password không được để trống.");
+                request.getSession().setAttribute("error", "Please enter valid password.");
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 return;
             }
             if (password.length() < 6 || confirmPassword.length() < 6) {
-                request.setAttribute("mess", "Password không duoc duoi 6 ky tu.");
+                request.getSession().setAttribute("error", "Please enter at least 6 characters.");
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 return;
             }
             if (!password.equals(confirmPassword)) {
-                request.setAttribute("mess", "Confirm password phải giống với password.");
+                request.getSession().setAttribute("error", "Confirm password must be the same as password.");
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 return;
             }
 
             User user = uDao.getUserByEmail(email);
             if (user == null) {
-                request.setAttribute("mess", "Không tìm thấy tài khoản.");
+                request.getSession().setAttribute("error", "Can't fint user account.");
                 request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                 return;
             }
@@ -112,7 +112,7 @@ public class ProfileServlet extends HttpServlet {
             try {
                 String hashedOldPass = uDao.getHashPass(oldPassword);
                 if (!user.getPassword().equals(hashedOldPass)) {
-                    request.setAttribute("mess", "Mật khẩu cũ không đúng.");
+                    request.getSession().setAttribute("error", "Old password incorrect.");
                     request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
                     return;
                 }
@@ -123,10 +123,10 @@ public class ProfileServlet extends HttpServlet {
                 String hashedPassword = uDao.getHashPass(password); // Hash mật khẩu mới
                 user.setPassword(hashedPassword);
                 uDao.updatePassword(email, hashedPassword); // Cập nhật mật khẩu đã hash
-                request.setAttribute("mess", "Cập nhật mật khẩu thành công.");
+                request.getSession().setAttribute("successMessage", "Change password successful!");
             } catch (NoSuchAlgorithmException ex) {
                 Logger.getLogger(ProfileServlet.class.getName()).log(Level.SEVERE, null, ex);
-                request.setAttribute("mess", "Đã xảy ra lỗi trong quá trình cập nhật mật khẩu.");
+                request.getSession().setAttribute("error", "Failed to change password successful!");
             }
 
             request.getRequestDispatcher("/WEB-INF/profilePassword.jsp").forward(request, response);
@@ -154,10 +154,11 @@ public class ProfileServlet extends HttpServlet {
 
                         int result = uDao.updateUser(user);
                         if (result > 0) {
+                            request.getSession().setAttribute("successMessage", "Update profile successful!");
                             response.sendRedirect("Profile?action=edit");
                         } else {
-                            request.setAttribute("message", "Failed to update profile.");
-                            request.setAttribute("user", user); // Pass the updated user back
+                            request.getSession().setAttribute("error", "Failed to update profile.");
+                            request.getSession().setAttribute("user", user); // Pass the updated user back
                             request.getRequestDispatcher("/WEB-INF/profile.jsp").forward(request, response);
                         }
                     }
