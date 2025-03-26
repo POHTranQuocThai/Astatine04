@@ -287,7 +287,7 @@
                                         <img src="${top.image}" alt="">
                                     </div>
                                     <div class="product-body">
-                                        
+
                                         <h3 class="product-name"><a href="Products?view=prod-details&id=${top.productId}">${top.productName}</a></h3>
                                         <h4 class="product-price"><fmt:formatNumber value="${top.price}" pattern="#,###" /> VNĐ</h4>
                                     </div>
@@ -363,7 +363,7 @@
                                                         <img src="${prod.image}" alt="">
                                                     </div>
                                                     <div class="product-body">
-                                                        
+
                                                         <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}">${prod.productName}</a></h3>
                                                         <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
                                                         <div class="product-btns">
@@ -404,7 +404,7 @@
                                                             </c:choose>
                                                         </div>
                                                         <div class="product-body">
-                                                            
+
                                                             <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}">${prod.productName}</a></h3>
                                                             <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
 
@@ -437,7 +437,7 @@
                                                             <img src="${prod.image}" alt="">
                                                         </div>
                                                         <div class="product-body">
-                                                            
+
                                                             <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}">${prod.productName}</a></h3>
                                                             <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
 
@@ -470,7 +470,7 @@
                                                             <img src="${prod.image}" alt="">
                                                         </div>
                                                         <div class="product-body">
-                                                            
+
                                                             <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}">${prod.productName}</a></h3>
                                                             <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
 
@@ -504,7 +504,7 @@
                                                                 <img src="${prod.image}" alt="">
                                                             </div>
                                                             <div class="product-body">
-                                                                
+
                                                                 <h3 class="product-name"><a href="Products?view=prod-details&id=${prod.productId}">${prod.productName}</a></h3>
                                                                 <h4 class="product-price"><fmt:formatNumber value="${prod.price}" pattern="#,###" /> VNĐ</h4>
 
@@ -546,25 +546,25 @@
                                                 <li class="page-item ${indexPage == i ? 'active' : ''}">
                                                     <c:choose>
                                                         <c:when test="${not empty selectedCategory}">
-                                                            <a class="page-link" href="Store?category=${selectedCategory}&page=${i}">${i}</a>
+                                                            <a class="page-link" href="Store?category=${selectedCategory}&page=${i}${not empty param.option ? '&option=' += param.option : ''}${not empty param.show ? '&show=' += param.show : ''}">${i}</a>
                                                         </c:when>
                                                         <c:when test="${not empty selectedBrand}">
-                                                            <a class="page-link" href="Store?brand=${selectedBrand}&page=${i}">${i}</a>
+                                                            <a class="page-link" href="Store?brand=${selectedBrand}&page=${i}${not empty param.option ? '&option=' += param.option : ''}${not empty param.show ? '&show=' += param.show : ''}">${i}</a>
                                                         </c:when>
                                                         <c:when test="${not empty param.search}">
-                                                            <a class="page-link" href="Store?search=${param.search}&page=${i}">${i}</a>
+                                                            <a class="page-link" href="Store?search=${param.search}&page=${i}${not empty param.option ? '&option=' += param.option : ''}${not empty param.show ? '&show=' += param.show : ''}">${i}</a>
                                                         </c:when>
                                                         <c:when test="${not empty param['price-min'] && not empty param['price-max']}">
-                                                            <a class="page-link" href="Store?price-min=${param['price-min']}&price-max=${param['price-max']}&page=${i}">${i}</a>
+                                                            <a class="page-link" href="Store?price-min=${param['price-min']}&price-max=${param['price-max']}&page=${i}${not empty param.option ? '&option=' += param.option : ''}${not empty param.show ? '&show=' += param.show : ''}">${i}</a>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <a class="page-link" href="Store?page=${i}">${i}</a>
+                                                            <a class="page-link" href="Store?page=${i}${not empty param.option ? '&option=' += param.option : ''}${not empty param.show ? '&show=' += param.show : ''}">${i}</a>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </li>
                                             </c:forEach>
                                         </ul>
-                                    </nav>                        
+                                    </nav>                       
                                 </div>
                                 <!-- /STORE -->
                             </div>
