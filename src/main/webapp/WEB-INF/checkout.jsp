@@ -8,6 +8,7 @@ Author     : Tran Quoc Thai - CE181618
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,6 +43,7 @@ Author     : Tran Quoc Thai - CE181618
         <!-- Custom stlylesheet -->
         <link type="text/css" rel="stylesheet" href="assets/css/style.css" />
         <link rel="stylesheet" href="assets/css/modal.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -240,7 +242,6 @@ Author     : Tran Quoc Thai - CE181618
                                 </div>
                                 <div class="cart-container">
                                     <c:set value="${discount}" var="dis"/>                    
-                                    <!-- Khởi tạo totalPrice bên ngoài vòng lặp -->
                                     <c:set var="shop" value="${SHOP}"></c:set>
                                     <c:set var="totalPrice" value="0" />
                                     <c:set var="count" value="0"/>
@@ -252,22 +253,25 @@ Author     : Tran Quoc Thai - CE181618
                                                 <img style="width: 100%; object-fit: contain;" src="${s.value.prod.image}" alt="${s.value.prod.productName}">
                                             </a>
                                             <a href="Products?view=prod-details&id=${s.value.prod.productId}" class="col-md-4 billing-details--item">${s.value.prod.productName}</a>
-                                            <div class="col-md-2 billing-details--item text-center">${s.value.prod.price}</div>
+                                            <div class="col-md-2 billing-details--item text-center">
+                                                <fmt:formatNumber value="${s.value.prod.price}" pattern="#,###" /> VNĐ
+                                            </div>
                                             <div class="input-number col-md-2 billing-details--item text-center" style="display: flex; align-items: center; justify-content: center;">
                                                 <input id="qty-${s.value.prod.productId}" style="height: 35px; width: 40px;padding: 0; text-align: center;" class="qty" type="number" value="${s.value.quantity}" min="1" max="${s.value.prod.countInStock}" readonly>
                                                 <div class="d-flex flex-column" style="margin-left: 5px;">
                                                     <a href="Quantity?action=inc&id=${s.value.prod.productId}" class="qty-up" style="cursor: pointer; padding: 0;">+</a>
-                                                    <a href="Quantity?action=dec&id=${s.value.prod.productId}"  class="qty-down" style="cursor: pointer; padding: 0;">-</a>
+                                                    <a href="Quantity?action=dec&id=${s.value.prod.productId}" class="qty-down" style="cursor: pointer; padding: 0;">-</a>
                                                 </div>
                                             </div>                     
-                                            <div class="col-md-2 billing-details--item text-center">${(s.value.prod.price * s.value.quantity)}</div>
+                                            <div class="col-md-2 billing-details--item text-center">
+                                                <fmt:formatNumber value="${s.value.prod.price * s.value.quantity}" pattern="#,###" /> VNĐ
+                                            </div>
                                             <a href="Checkout?action=remove&id=${s.value.prod.productId}" class="col-md-1 billing-details--item text-center">
                                                 <i class="bi bi-trash3-fill" title="Remove item" style="cursor: pointer;"></i>
                                             </a>
                                         </div> 
                                         <c:set var="total" value="${s.value.prod.price * s.value.quantity}" />
                                         <c:set var="totalPrice" value="${totalPrice + total}" />
-
                                     </c:forEach> 
                                     <c:set value="${totalPrice * (discount/100.0)}" var="discounted"/>
                                 </div>
@@ -286,14 +290,18 @@ Author     : Tran Quoc Thai - CE181618
                                 <div class="order-products">
                                     <div class="order-col">
                                         <div>Provisional</div>
-                                        <div id="totalPriceDisplay">$${totalPrice}</div>
+                                        <div id="totalPriceDisplay">
+                                            <fmt:formatNumber value="${totalPrice}" pattern="#,###" /> VNĐ
+                                        </div>
                                     </div>
                                     <c:set var="firstTransportId" value="${transport[0].transportId}" />
                                     <c:set var="firstShip" value="${shipPrice + (transport[0].transportId * 500)}" />
                                     <div class="order-col">
                                         <div>Shipping</div>
                                         <div>
-                                            <strong class="fee">${firstShip}</strong>                   
+                                            <strong class="fee">
+                                                <fmt:formatNumber value="${firstShip}" pattern="#,###" /> VNĐ
+                                            </strong>                   
                                         </div>
                                     </div>
                                 </div>
@@ -525,6 +533,10 @@ Author     : Tran Quoc Thai - CE181618
 
                                 <script>
                                     document.addEventListener("DOMContentLoaded", function () {
+                                        function formatNumber(number) {
+                                            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }
+
                                         function updateTotal(shipFee = null, transportId = null) {
                                             let feeElement = document.querySelector(".fee");
                                             let feeText = feeElement.innerText.trim();
@@ -532,13 +544,13 @@ Author     : Tran Quoc Thai - CE181618
 
                                             // Nếu có shipFee, cập nhật phí vận chuyển và ID phương thức vận chuyển
                                             if (shipFee !== null) {
-                                                feeElement.innerText = shipFee > 0 ? shipFee.toFixed(2) : "FREE";
+                                                feeElement.innerText = formatNumber(shipFee) + " VNĐ";
                                                 if (transportInput) {
                                                     transportInput.value = transportId; // Cập nhật giá trị ID vào input hidden
                                                 }
                                             } else {
                                                 // Nếu không có shipFee mới, lấy giá trị hiện tại của `.fee`
-                                                shipFee = (feeText === "FREE") ? 0 : parseFloat(feeText.replace("$", "")) || 0;
+                                                shipFee = (feeText === "FREE") ? 0 : parseFloat(feeText.replace(/[^0-9.-]+/g, "")) || 0;
                                             }
 
                                             // Lấy totalPrice và discounted từ JSP
@@ -549,19 +561,21 @@ Author     : Tran Quoc Thai - CE181618
                                             let orderTotal = (totalPrice !== 0) ? (totalPrice - discounted + shipFee) : 0;
 
                                             // Cập nhật tổng đơn hàng
-                                            document.getElementById("orderTotal").innerText = orderTotal.toFixed(2);
+                                            document.getElementById("orderTotal").innerText = orderTotal.toFixed(0);
+                                            document.querySelector(".order-total").innerHTML = formatNumber(orderTotal.toFixed(0)) + " VNĐ" +
+                                                    '<span id="orderTotal" style="display: none;">' + orderTotal.toFixed(0) + '</span>';
                                         }
 
                                         // Khi chọn Transport Unit, cập nhật phí vận chuyển và transportId
                                         window.checkout = function (transportId, shipFee) {
                                             updateTotal(parseFloat(shipFee), transportId);
                                         };
-                                        // ✅ Chỉ gọi sau khi DOM đã load xong
+
+                                        // Gọi hàm checkout sau khi DOM đã load xong
                                         setTimeout(() => {
                                             checkout("${firstTransportId}", "${firstShip}");
                                         }, 0);
                                     });
-
                                 </script>
 
 
@@ -662,7 +676,7 @@ Author     : Tran Quoc Thai - CE181618
                                 <li><a href="Profile?action=edit">My Account</a></li>
                                 <li><a href="Checkout">View Cart</a></li>
                                 <li><a href="#">Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="Profile?action=order">Track My Order</a></li>
                                 <li><a href="#">Help</a></li>
                             </ul>
                         </div>
@@ -698,7 +712,6 @@ Author     : Tran Quoc Thai - CE181618
     </footer>
     <!-- /FOOTER -->
 </div>
-
 <!-- jQuery Plugins -->
 <script src="assets/js/JSDefault/jquery.min.js"></script>
 <script src="assets/js/JSDefault/bootstrap.min.js"></script>

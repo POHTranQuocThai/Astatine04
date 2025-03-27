@@ -30,7 +30,8 @@
             <!-- Icon New-->
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_drop_down" />
-            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>        
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
         </head>
 
@@ -149,32 +150,40 @@
                     </tbody>
                 </table>
 
-<!--                <div class="pagination">
-                    <c:if test="${index > 1}">
-                        <a href="Product?index=1" class="pagination-link"><i class='bx bxs-chevrons-left' ></i></a>
-                        </c:if>
-                        <c:if test="${index > 1}">
-                        <a href="Product?index=${index - 1}" class="pagination-link"><i class='bx bxs-chevron-left'></i></a>
-                        </c:if>
+                <!--                <div class="pagination">
+                <c:if test="${index > 1}">
+                    <a href="Product?index=1" class="pagination-link"><i class='bx bxs-chevrons-left' ></i></a>
+                </c:if>
+                <c:if test="${index > 1}">
+                <a href="Product?index=${index - 1}" class="pagination-link"><i class='bx bxs-chevron-left'></i></a>
+                </c:if>
 
-                    <c:forEach begin="${index > 2 ? index - 2 : 1}" 
-                               end="${index + 2 > a.getNumberPageAd() ? a.getNumberPageAd() : index + 2}" var="i">
-                        <a href="Product?index=${i}" class="pagination-link ${index == i ? 'active' : ''}">${i}</a>
-                    </c:forEach>
+                <c:forEach begin="${index > 2 ? index - 2 : 1}" 
+                           end="${index + 2 > a.getNumberPageAd() ? a.getNumberPageAd() : index + 2}" var="i">
+                    <a href="Product?index=${i}" class="pagination-link ${index == i ? 'active' : ''}">${i}</a>
+                </c:forEach>
 
-                    <c:if test="${index < a.getNumberPageAd()}">
-                        <a href="Product?index=${index + 1}" class="pagination-link"><i class='bx bxs-chevron-right' ></i></a>
-                        </c:if>
-                        <c:if test="${index < a.getNumberPageAd()}">
-                        <a href="Product?index=${a.getNumberPageAd()}" class="pagination-link"><i class='bx bxs-chevrons-right' ></i></a>
-                        </c:if>
-                </div>-->
+                <c:if test="${index < a.getNumberPageAd()}">
+                    <a href="Product?index=${index + 1}" class="pagination-link"><i class='bx bxs-chevron-right' ></i></a>
+                </c:if>
+                <c:if test="${index < a.getNumberPageAd()}">
+                <a href="Product?index=${a.getNumberPageAd()}" class="pagination-link"><i class='bx bxs-chevrons-right' ></i></a>
+                </c:if>
+        </div>-->
             </section>
         </main>
     </body>
-    <div id="toast-container"></div>
-
     <!-- JS Link-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="text/javascript" src="../assets/js/utils/notification.js"></script>
+
+    <script>
+                            let notication = '${sessionScope.success}'
+                            console.log(notication);
+                            if (notication) {
+                                showToast(notication, "success")
+                            }
+    </script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminTable.js"></script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminDragDropImage.js"></script>
 </html>

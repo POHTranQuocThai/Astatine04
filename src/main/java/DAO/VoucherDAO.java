@@ -58,7 +58,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public int createVoucher(Voucher voucher) {
-        String query = "INSERT INTO Vouchers (Voucher_ID, Voucher_Name, Discount, Expiry)\n"
+        String query = "INSERT INTO Vouchers (Voucher_ID, Voucher_Name, Discount, Expiry_Date)\n"
                 + "VALUES ((SELECT COALESCE(MAX(Voucher_ID), 0) + 1 FROM Vouchers), ?, ?, ?)";
         Object[] params = {
             voucher.getName(),
@@ -73,7 +73,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public int editVoucher(Voucher voucher) {
-        String query = "UPDATE Vouchers SET Voucher_Name = ?, Discount = ?, Expiry = ? WHERE Voucher_ID = ?";
+        String query = "UPDATE Vouchers SET Voucher_Name = ?, Discount = ?, Expiry_Date = ? WHERE Voucher_ID = ?";
         Object[] params = {
             voucher.getName(),
             voucher.getDiscount(),
@@ -82,8 +82,7 @@ public class VoucherDAO extends DBContext {
         };
         try {
             return execQuery(query, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
         }
         return 0;
     }

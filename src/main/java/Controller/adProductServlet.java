@@ -152,10 +152,10 @@ public class adProductServlet extends HttpServlet {
             Products product = new Products(0, productName, countInStock, selled, price, imagePaths.toString(), description, type, brand);
             int result = pDAO.createProduct(product);
             if (result > 0) {
-                request.setAttribute("message", "Sản phẩm đã được thêm thành công!");
+                request.getSession().setAttribute("success", "Add product successful!");
                 response.sendRedirect("Product?action=list");
             } else {
-                request.setAttribute("error", "Failed to create product.");
+                request.setAttribute("error", "Failed to add product.");
                 request.getRequestDispatcher("WEB-INF/adCreateProduct.jsp").forward(request, response);
             }
         }
@@ -205,6 +205,7 @@ public class adProductServlet extends HttpServlet {
                     System.out.println("L" + pDAO.updateProduct(product));
                     request.setAttribute("types", pDAO.getAllType());
                     request.setAttribute("brands", pDAO.getAllBrand());
+                    request.getSession().setAttribute("success", "Edit product successful!");
                     response.sendRedirect("Product?action=list");
                 } catch (SQLException ex) {
                     Logger.getLogger(adProductServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -213,6 +214,7 @@ public class adProductServlet extends HttpServlet {
             if (action.equals("delete")) {
                 int id = Integer.parseInt(idParam);
                 pDAO.deleteProduct(id);
+                request.getSession().setAttribute("success", "Delete product successful!");
                 response.sendRedirect("Product?action=list");
             }
         }

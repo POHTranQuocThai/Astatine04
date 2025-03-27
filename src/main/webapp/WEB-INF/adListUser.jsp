@@ -28,10 +28,8 @@
             <!-- Icon New-->
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_drop_down" />
-            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
-            
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>   
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
         </head>
 
@@ -167,8 +165,8 @@
                     <div class="modal-box"> 
                         <div class="form">
                             <h1>Edit User</h1>
-                            <form id="editUserForm" action="User?action=edit&id=${user.userId}" method="post">
-                                <input type="hidden" name="action" value="edit">
+                            <form action="User?action=edit" method="post">
+                                <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="id" id="userId" value="${user.userId}">
                                 <input type="hidden" id="password" name="password" value="${user.password}">
                                 <input type="hidden" id="country" name="country" value="${user.country}">
@@ -225,31 +223,21 @@
                         </div>
                     </div>  
                 </div>
-                <!--                <div class="pagination">
-                <c:if test="${index > 1}">
-                    <a href="User?index=1" class="pagination-link"><i class='bx bxs-chevrons-left' ></i></a>
-                </c:if>
-                <c:if test="${index > 1}">
-                <a href="User?index=${index - 1}" class="pagination-link"><i class='bx bxs-chevron-left'></i></a>
-                </c:if>
-
-                <c:forEach begin="${index > 2 ? index - 2 : 1}" 
-                           end="${index + 2 > a.getNumberPage() ? a.getNumberPage() : index + 2}" var="i">
-                    <a href="User?index=${i}" class="pagination-link ${index == i ? 'active' : ''}">${i}</a>
-                </c:forEach>
-
-                <c:if test="${index < a.getNumberPage()}">
-                    <a href="User?index=${index + 1}" class="pagination-link"><i class='bx bxs-chevron-right' ></i></i>
-                    </a>
-                </c:if>
-                <c:if test="${index < a.getNumberPage()}">
-                    <a href="User?index=${a.getNumberPage()}" class="pagination-link"><i class='bx bxs-chevrons-right' ></i></a>
-                </c:if>
-        </div>            -->
             </section>               
         </main>
     </body>
+
     <!-- JS Link-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="text/javascript" src="../assets/js/utils/notification.js"></script>
+
+    <script>
+                            let notication = '${sessionScope.success}'
+                            console.log(notication);
+                            if (notication) {
+                                showToast(notication, "success")
+                            }
+    </script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminTable.js"></script>
     <script type="text/javascript" src="../assets/js/Admin/submitUser.js"></script>
 </html>

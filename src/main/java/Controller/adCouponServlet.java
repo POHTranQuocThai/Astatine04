@@ -33,7 +33,7 @@ public class adCouponServlet extends HttpServlet {
 
         if ("list".equals(action)) {
             List<Voucher> list = vDAO.getAllVoucher();
-            request.setAttribute("couponList", list);
+            request.getSession().setAttribute("couponList", list);
             request.getRequestDispatcher("/WEB-INF/adCoupon.jsp").forward(request, response);
             return; // Exit after forwarding
         }
@@ -56,21 +56,15 @@ public class adCouponServlet extends HttpServlet {
 
         switch (action) {
             case "edit":
-                request.setAttribute("coupon", voucher);
+                request.getSession().setAttribute("coupon", voucher);
                 request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
                 break;
             case "create":
                 request.getRequestDispatcher("/WEB-INF/adCouponCreate.jsp").forward(request, response);
                 break;
             case "delete":
-                int result = vDAO.deleteVoucher(Integer.parseInt(idParam));
-
-                if (result > 0) {
-                    response.sendRedirect("Coupon?action=list");
-                } else {
-                    request.setAttribute("errorMessage", "Unable to delete voucher");
-                    request.getRequestDispatcher("/WEB-INF/adCoupon.jsp").forward(request, response);
-                }
+                request.getSession().setAttribute("coupon", voucher);
+                request.getRequestDispatcher("/WEB-INF/adCouponDelete.jsp").forward(request, response);
                 break;
             default:
                 response.sendRedirect("Coupon");
@@ -91,7 +85,7 @@ public class adCouponServlet extends HttpServlet {
             expiryDate = LocalDate.parse(expiry);
 
             if (name == null || discountStr == null || expiry == null || name.isEmpty() || discountStr.isEmpty() || expiry.isEmpty()) {
-                request.setAttribute("errorMessage", "All fields are required.");
+                request.getSession().setAttribute("error", "All fields are required.");
                 request.getRequestDispatcher("/WEB-INF/adCouponCreate.jsp").forward(request, response);
                 return;
             }
@@ -100,75 +94,80 @@ public class adCouponServlet extends HttpServlet {
             try {
                 discount = Integer.parseInt(discountStr);
             } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "Invalid discount value.");
+                request.getSession().setAttribute("error", "Invalid discount value.");
                 request.getRequestDispatcher("/WEB-INF/adCouponCreate.jsp").forward(request, response);
                 return;
             }
 
             Voucher newVoucher = new Voucher(0, name, discount, expiryDate);
             int result = vDAO.createVoucher(newVoucher);
+            System.out.println(result);
 
             if (result > 0) {
+                request.getSession().setAttribute("success", "Create voucher successful!");
                 response.sendRedirect("Coupon?action=list");
             } else {
-                request.setAttribute("errorMessage", "Unable to create voucher");
+                request.getSession().setAttribute("error", "Unable to create voucher");
                 request.getRequestDispatcher("/WEB-INF/adCouponCreate.jsp").forward(request, response);
             }
             return;
         }
 
         if (idParam != null && !idParam.isEmpty()) {
-            int voucherId;
+                System.out.println("ac"+action);
             try {
-                voucherId = Integer.parseInt(idParam);
+                int id = Integer.parseInt(request.getParameter("id"));
+                int voucherId = Integer.parseInt(idParam);
+                System.out.println("vv" + id);
+                System.out.println("ac"+action);
+                if ("delete".equals(action)) {
+                    System.out.println("v" + id);
+                    int result = vDAO.deleteVoucher(id);
+                    System.out.println("t" + result);
+                    if (result > 0) {
+                        request.getSession().setAttribute("success", "Delete voucher successful!");
+                        response.sendRedirect("Coupon?action=list");
+                    } else {
+                        request.getSession().setAttribute("error", "Unable to delete voucher");
+                        request.getRequestDispatcher("/WEB-INF/adCouponDelete.jsp").forward(request, response);
+                    }
+                }
+                if ("edit".equals(action)) {
+                    String name = request.getParameter("voucherName");
+                    String discountStr = request.getParameter("discount");
+                    String expiry = request.getParameter("expiry");
+                    expiryDate = LocalDate.parse(expiry);
+                    if (name == null || discountStr == null || expiry == null || name.isEmpty() || discountStr.isEmpty() || expiry.isEmpty()) {
+                        request.getSession().setAttribute("error", "All fields are required.");
+                        request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
+                        return;
+                    }
+
+                    int discount;
+                    try {
+                        discount = Integer.parseInt(discountStr);
+                    } catch (NumberFormatException e) {
+                        request.getSession().setAttribute("error", "Invalid discount value.");
+                        request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
+                        return;
+                    }
+
+                    Voucher editedVoucher = new Voucher(voucherId, name, discount, expiryDate);
+                    int result = vDAO.editVoucher(editedVoucher);
+
+                    if (result > 0) {
+                        request.getSession().setAttribute("success", "Edit voucher successful!");
+                        response.sendRedirect("Coupon?action=list");
+                    } else {
+                        request.getSession().setAttribute("error", "Unable to edit voucher");
+                        request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
+                    }
+                    return;
+                }
+                
             } catch (NumberFormatException e) {
                 response.sendRedirect("Coupon?action=list");
-                return;
             }
-
-            if ("edit".equals(action)) {
-                String name = request.getParameter("voucherName");
-                String discountStr = request.getParameter("discount");
-                String expiry = request.getParameter("expiry");
-                expiryDate = LocalDate.parse(expiry);
-                if (name == null || discountStr == null || expiry == null || name.isEmpty() || discountStr.isEmpty() || expiry.isEmpty()) {
-                    request.setAttribute("errorMessage", "All fields are required.");
-                    request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
-                    return;
-                }
-
-                int discount;
-                try {
-                    discount = Integer.parseInt(discountStr);
-                } catch (NumberFormatException e) {
-                    request.setAttribute("errorMessage", "Invalid discount value.");
-                    request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
-                    return;
-                }
-
-                Voucher editedVoucher = new Voucher(voucherId, name, discount, expiryDate);
-                int result = vDAO.editVoucher(editedVoucher);
-
-                if (result > 0) {
-                    response.sendRedirect("Coupon?action=list");
-                } else {
-                    request.setAttribute("errorMessage", "Unable to edit voucher");
-                    request.getRequestDispatcher("/WEB-INF/adCouponEdit.jsp").forward(request, response);
-                }
-                return;
-            }
-
-//            if ("delete".equals(action)) {
-//                System.out.println("v" + voucherId);
-//                int result = vDAO.deleteVoucher(voucherId);
-//                System.out.println("t" + result);
-//                if (result > 0) {
-//                    response.sendRedirect("Coupon");
-//                } else {
-//                    request.setAttribute("errorMessage", "Unable to delete voucher");
-//                    request.getRequestDispatcher("/WEB-INF/adCouponDelete.jsp").forward(request, response);
-//                }
-//            }
         }
     }
 

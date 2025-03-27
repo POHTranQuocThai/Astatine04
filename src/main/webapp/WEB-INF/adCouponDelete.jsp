@@ -34,7 +34,8 @@
             <div class="modal-box">
                 <h1 style="text-align: center;">Delete Coupon</h1>
                 <form action="Coupon?action=delete" method="post">
-                    <input type="hidden" name="voucherId" value="${coupon.voucherId}">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" value="${coupon.voucherId}">
                     <div class="center-bottom">
                         <p style="font-size: 20px;">Do you want to delete <span style="font-weight: 500; color: #21A691">${coupon.name}</span>?</p>
                     </div>
