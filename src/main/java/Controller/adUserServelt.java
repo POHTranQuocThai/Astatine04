@@ -133,19 +133,18 @@ public class adUserServelt extends HttpServlet {
 
                 try {
                     uDAO.updateUser(user);
+                    request.getSession().setAttribute("success", "Edit user infomation successful!");
                     System.out.println("Cập nhật user thành công!");
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.getWriter().write(new Gson().toJson(user));
                 } catch (SQLException ex) {
                     System.out.println("Lỗi SQL: " + ex.getMessage());
-                    ex.printStackTrace();
                 }
 
                 request.setAttribute("user", user);
                 response.sendRedirect("User?action=list");
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
                 response.getWriter().write("error");
             }
         }

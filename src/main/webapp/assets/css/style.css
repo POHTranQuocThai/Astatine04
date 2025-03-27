@@ -198,13 +198,11 @@ textarea.input {
 
 .input-number .qty-up {
     right: 0;
-    top: 5px;
-    border-bottom: 0px;
+    top: 0px;
 }
 
 .input-number .qty-down {
     right: 0;
-    bottom: 5px;
 }
 
 .input-number .qty-up:hover, .input-number .qty-down:hover {

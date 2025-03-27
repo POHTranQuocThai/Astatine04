@@ -71,7 +71,7 @@ public class OrderServlet extends HttpServlet {
             return;
         }
         if (!uDAO.checkInfoUser(user)) {
-            request.setAttribute("messInfo", "Please enter full infomations of user before the order!");
+            request.getSession().setAttribute("error", "Please enter full infomations of user before the order!");
             request.getRequestDispatcher("Profile?action=edit").forward(request, response);
             return;
         }

@@ -111,9 +111,7 @@ public class OrderDAO extends DBContext {
         ProductDAO pDAO = new ProductDAO();
         int rowsAffected = 0;
 
-
         String sql = "UPDATE Orders SET Street = ?, Ward = ?, District = ?, City = ?, Country = ?,Voucher_Id = ?,Transport_Id = ?, Phone = ?, Order_Date = GETDATE(), Status = ?, Total_Price = ?, Email = ?, Payment = ?,Transport_Cost = ? WHERE Customer_Id = ? and Status = 'Pending'";
-
 
         String updateStock = "UPDATE Products SET Count_In_Stock = ?, Sold = ? WHERE Product_Id = ?";
         String sqlNextId = "SELECT ISNULL(MAX(Order_Id), 0) as nextId FROM Orders";
@@ -135,8 +133,7 @@ public class OrderDAO extends DBContext {
             order.getTotalPrice(),
             order.getEmail(),
             payment,
-
-            shipP != "" ? Double.parseDouble(shipP) : null,
+            shipP != "" ? Double.parseDouble(shipP.replaceAll("[^\\d.]", "")) : null, 
             userId
         };
 

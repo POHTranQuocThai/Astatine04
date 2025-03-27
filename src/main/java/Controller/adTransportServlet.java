@@ -40,8 +40,7 @@ public class adTransportServlet extends HttpServlet {
         }
 
         if ("list".equals(action)) {
-            List<Transport> list = tDao.getAllTransport();
-            request.setAttribute("transportList", tDao.getAllTransport());
+            request.getSession().setAttribute("transportList", tDao.getAllTransport());
             request.getRequestDispatcher("/WEB-INF/adTransportList.jsp").forward(request, response);
             return;
         }
@@ -65,14 +64,17 @@ public class adTransportServlet extends HttpServlet {
 
         switch (action) {
             case "edit":
-                request.setAttribute("transport", transport);
+                request.getSession().setAttribute("success", "Update transport unit successful!");
+                request.getSession().setAttribute("transport", transport);
                 request.getRequestDispatcher("/WEB-INF/adTransportEdit.jsp").forward(request, response);
                 break;
             case "create":
+                request.getSession().setAttribute("success", "Create transport unit successful!");
                 request.getRequestDispatcher("/WEB-INF/adTransportCreate.jsp").forward(request, response);
                 break;
             case "delete":
-                request.setAttribute("transport", transport);
+                request.getSession().setAttribute("success", "Delete transport unit successful!");
+                request.getSession().setAttribute("transport", transport);
                 request.getRequestDispatcher("/WEB-INF/adTransportDelete.jsp").forward(request, response);
 
                 break;
@@ -106,7 +108,7 @@ public class adTransportServlet extends HttpServlet {
                 response.sendRedirect("Transport?action=list");
             } else {
                 System.out.println("Create failed!");
-                request.setAttribute("error", "Failed to create transport");
+                request.getSession().setAttribute("error", "Failed to create transport");
                 request.getRequestDispatcher("/WEB-INF/adTransportCreate.jsp").forward(request, response);
             }
             return;
@@ -133,7 +135,7 @@ public class adTransportServlet extends HttpServlet {
                     response.sendRedirect("Transport?action=list");
                 } else {
                     System.out.println("Update failed!");
-                    request.setAttribute("error", "Failed to update transport");
+                    request.getSession().setAttribute("error", "Failed to update transport");
                     request.getRequestDispatcher("/WEB-INF/adTransportEdit.jsp").forward(request, response);
                 }
                 return;
@@ -144,8 +146,8 @@ public class adTransportServlet extends HttpServlet {
                 if (result > 0) {
                     response.sendRedirect("Transport?action=list");
                 } else {
-                    request.setAttribute("error", "Failed to delete transport");
-                    request.setAttribute("transportList", tDao.getAllTransport());
+                    request.getSession().setAttribute("error", "Failed to delete transport");
+                    request.getSession().setAttribute("transportList", tDao.getAllTransport());
                     request.getRequestDispatcher("/WEB-INF/adTransportList.jsp").forward(request, response);
                 }
             }
