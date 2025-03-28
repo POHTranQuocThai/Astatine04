@@ -161,7 +161,7 @@ public class CommentDAO extends db.DBContext {
     public boolean updateComment(int commentId, String newContent) {
         try {
             String query = "UPDATE Comments SET Comment_Text = ? WHERE Comment_Id = ?";
-            Object[] params = {newContent,commentId, };
+            Object[] params = {newContent, commentId,};
             return execQuery(query, params) > 0; // Sửa lại thành execQuery()
         } catch (SQLException ex) {
             Logger.getLogger(CommentDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -169,30 +169,72 @@ public class CommentDAO extends db.DBContext {
         return false;
     }
 
-    public boolean deleteComment(int commentId) {
-    String deleteCommentReactions = "DELETE FROM Comment_Reactions WHERE Comment_Id = ?";
-    String deleteComment = "DELETE FROM Comments WHERE Comment_Id = ?";
+    public boolean deleteComment(int commentId, int customerId) {
+        String deleteCommentReactions = "WITH CommentTree AS ( "
+                + "    SELECT Comment_Id FROM Comments WHERE Comment_Id = ? AND Customer_Id = ? "
+                + "    UNION ALL "
+                + "    SELECT c.Comment_Id FROM Comments c "
+                + "    INNER JOIN CommentTree ct ON c.Parent_Comment_Id = ct.Comment_Id "
+                + ") "
+                + "DELETE FROM Comment_Reactions WHERE Comment_Id IN (SELECT Comment_Id FROM CommentTree);";
 
-    try (Connection conn = getConnection();
-         PreparedStatement stmt1 = conn.prepareStatement(deleteCommentReactions);
-         PreparedStatement stmt2 = conn.prepareStatement(deleteComment)) {
+        String deleteComment = "WITH CommentTree AS ( "
+                + "    SELECT Comment_Id FROM Comments WHERE Comment_Id = ? AND Customer_Id = ? "
+                + "    UNION ALL "
+                + "    SELECT c.Comment_Id FROM Comments c "
+                + "    INNER JOIN CommentTree ct ON c.Parent_Comment_Id = ct.Comment_Id "
+                + ") "
+                + "DELETE FROM Comments WHERE Comment_Id IN (SELECT Comment_Id FROM CommentTree);";
 
-        conn.setAutoCommit(false); // Bắt đầu transaction
+        Connection conn = null;
+        PreparedStatement stmt1 = null;
+        PreparedStatement stmt2 = null;
 
-        stmt1.setInt(1, commentId);
-        stmt1.executeUpdate(); // Xóa phản ứng trước
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // Bắt đầu transaction
 
-        stmt2.setInt(1, commentId);
-        int rowsDeleted = stmt2.executeUpdate(); // Xóa bình luận
+            // Xóa phản hồi của tất cả comment cha + con
+            stmt1 = conn.prepareStatement(deleteCommentReactions);
+            stmt1.setInt(1, commentId);
+            stmt1.setInt(2, customerId);
+            stmt1.executeUpdate();
 
-        conn.commit(); // Commit nếu không có lỗi
-        return rowsDeleted > 0;
+            // Xóa tất cả comment cha + con
+            stmt2 = conn.prepareStatement(deleteComment);
+            stmt2.setInt(1, commentId);
+            stmt2.setInt(2, customerId);
+            int rowsDeleted = stmt2.executeUpdate();
 
-    } catch (SQLException ex) {
-        Logger.getLogger(CommentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            conn.commit(); // Commit nếu không có lỗi
+            return rowsDeleted > 0;
+
+        } catch (SQLException ex) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback nếu có lỗi
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            Logger.getLogger(CommentDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            // Đóng tài nguyên
+            try {
+                if (stmt1 != null) {
+                    stmt1.close();
+                }
+                if (stmt2 != null) {
+                    stmt2.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return false;
     }
-    return false;
-}
-
 
 }

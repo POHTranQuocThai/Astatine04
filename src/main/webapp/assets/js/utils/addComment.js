@@ -231,7 +231,7 @@ function saveEditedComment(commentId, newContent, contentDiv) {
 }
 
 
-function deleteComment(commentId, commentDiv) {
+function deleteComment(commentId, customerId, commentDiv) {
     if (!confirm("Are you sure you want to delete this comment?")) {
         return;
     }
@@ -241,7 +241,7 @@ function deleteComment(commentId, commentDiv) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({commentId})
+        body: JSON.stringify({commentId, customerId})
     })
             .then(response => response.json())
             .then(data => {

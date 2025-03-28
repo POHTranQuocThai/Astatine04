@@ -86,10 +86,10 @@ public class deleteCommentServlet extends HttpServlet {
             JsonObject json = new JsonParser().parse(reader).getAsJsonObject();
 
             int commentId = json.get("commentId").getAsInt();
+            int customerId = json.get("customerId").getAsInt();
 
             // Gọi DAO để xóa bình luận
-            boolean deleted = comDAO.deleteComment(commentId);
-
+            boolean deleted = comDAO.deleteComment(commentId, customerId);
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", deleted);
             out.print(jsonResponse);

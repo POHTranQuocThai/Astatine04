@@ -617,7 +617,7 @@
                                 deleteIcon.style.cursor = "pointer";
                                 deleteIcon.style.color = "gray";
                                 deleteIcon.onclick = function () {
-                                    deleteComment(commentId, commentDiv);
+                                    deleteComment(commentId, userId, commentDiv);
                                 };
 
                                 // 🛠️ Gộp tất cả vào container
