@@ -70,16 +70,18 @@ public class OrderDAO extends DBContext {
             });
 
             for (Order order : cDAO.getProductsInCart(customerId)) {
+                
                 Products prod = pDAO.getProductById(order.getProductId());
                 Object[] insertOrderDetailParam = {
                     nextOrderDetail++, // Order_Detail_Id, tăng nextId cho mỗi sản phẩm mới   
                     order.getProductId(), // Product_ID
                     nextId,
-                    order.getAmount(), // Amount           
-                    order.getAmount() * prod.getPrice()// TotalPrice
+                    order.getAmount(), // Amount     
+                    prod.getPrice()
                 };
                 rowsAffected += execQuery(insertOrderDetail, insertOrderDetailParam);
             }
+            
         } else {
 
             for (Order order : cDAO.getProductsInCart(customerId)) {
