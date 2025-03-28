@@ -237,6 +237,7 @@
                             if (notication) {
                                 showToast(notication, "success")
                             }
+        <c:remove var="success" scope="session"/>
     </script>
     <script type="text/javascript" src="./assets/js/JSRemake/adminTable.js"></script>
     <script type="text/javascript" src="../assets/js/Admin/submitUser.js"></script>

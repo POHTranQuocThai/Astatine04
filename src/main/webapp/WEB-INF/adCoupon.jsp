@@ -142,11 +142,12 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="text/javascript" src="../assets/js/utils/notification.js"></script>
     <script>
-                            let notication = '${sessionScope.success}'
-                            console.log(notication);
-                            if (notication) {
-                                showToast(notication, "success")
-                            }
+                        let notication = '${sessionScope.success}'
+                        console.log(notication);
+                        if (notication) {
+                            showToast(notication, "success")
+                        }
+        <c:remove var="success" scope="session"/>
     </script>
 
     <!-- JS Link-->

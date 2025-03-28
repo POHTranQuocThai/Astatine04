@@ -76,7 +76,7 @@
                 <li>
                     <a href="Transport">
                         <i class='bx bxs-package'></i>                        
-                        <span>Voucher</span>
+                        <span>Transport</span>
                     </a>
                 </li>
             </ul>
