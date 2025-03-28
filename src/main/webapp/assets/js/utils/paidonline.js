@@ -5,7 +5,7 @@
 const MY_BANK = {
     CONTENT: 'ASTATINE'
 };
-const API_KEY = 'AK_CS.bf647410eea911efacfaab0600938aa6.mtWr04QyjhSG2YLIZY2wZTJboeVk5RhUFieUcHWAbwxPmoFQUmPO9ytNtr3bw0c33uJG4TiR';
+const API_KEY = 'AK_CS.82a8d2d00b1b11f097089522635f3f80.nKzqLxAOmP1lfjqhfx2CyiRcfH50nV1QYSYXcrHgXjvMLNXSy2wen2gddW0Pxxc4qdCrdxx9';
 const API_URL = 'https://oauth.casso.vn/v2/transactions';
 
 function showToast(message, type) {
@@ -28,8 +28,9 @@ function showToast(message, type) {
 let isSuccess = false;
 let intervalId = null;
 
-const handlePaid = (total,voucherId,transportId) => {
-    const paymentOnline = (amount) => {
+const handlePaid = (payPrice, voucherId) => {
+    const payPrices = parseFloat(payPrice);
+    const paymentOnline = (payPrices) => {
         const checkedRadio = document.querySelector('input[name="payment"]:checked');
         const orderSubmit = document.querySelector('.order-submit');
         const paidMessage = document.querySelector('.paid-message');
@@ -37,7 +38,7 @@ const handlePaid = (total,voucherId,transportId) => {
 
         if (checkedRadio && checkedRadio.id === "payment-2") {
             const desc = MY_BANK.CONTENT + randomUppercaseLetters();
-            const QR = `https://api.vietqr.io/image/970422-8888331199372-BpFflbu.jpg?accountName=CAO%20TOAN%20THANG&amount=${amount}&addInfo=${desc}`;
+            const QR = `https://api.vietqr.io/image/970422-8888331199372-BpFflbu.jpg?accountName=CAO%20TOAN%20THANG&amount=${payPrices}&addInfo=${desc}`;
             imgQr.src = QR;
             imgQr.style.display = "block";
             orderSubmit.style.pointerEvents = 'none';
@@ -48,7 +49,7 @@ const handlePaid = (total,voucherId,transportId) => {
             paidMessage.style.textAlign = 'center';
 
             // Tạo phần tử hiển thị thời gian
-         
+
             let displayTiming = document.createElement('span');
             paidMessage.appendChild(displayTiming);
 
@@ -69,7 +70,7 @@ const handlePaid = (total,voucherId,transportId) => {
                 if (timeLeft === 0) {
                     clearInterval(countdown); // Dừng bộ đếm khi hết 17s
                     intervalId = setInterval(() => {
-                        checkPaid(amount, desc, total,voucherId,transportId);
+                        checkPaid(desc, payPrices, voucherId);
                     }, 1000); // Chờ 3s rồi kiểm tra
                 }
             }, 1000);
@@ -90,17 +91,20 @@ const handlePaid = (total,voucherId,transportId) => {
     };
 
     // Kiểm tra trạng thái ban đầu
-    paymentOnline(total);
+    paymentOnline(payPrices);
 
     document.querySelectorAll('input[name="payment"]').forEach((radio) => {
         radio.addEventListener("change", function () {
-            paymentOnline(total);
+            paymentOnline(payPrices);
         });
     });
 };
 
 
-const checkPaid = async (price, content, total,voucherId,transportId) => {
+const checkPaid = async (content, payPrices, voucherId) => {
+    console.log(payPrices);
+    let feeValue = document.querySelector(".fee").textContent.trim();
+    const transportId = document.querySelector("#transportId").value;
     if (isSuccess) {
         if (intervalId)
             clearInterval(intervalId);
@@ -119,26 +123,26 @@ const checkPaid = async (price, content, total,voucherId,transportId) => {
             console.warn("API bị giới hạn, đợi 30 giây trước khi thử lại...");
             clearInterval(intervalId); // Dừng kiểm tra để tránh spam API
             setTimeout(() => {
-                intervalId = setInterval(() => checkPaid(price, content, total), 3000); // Kiểm tra lại sau 30 giây
+                intervalId = setInterval(() => checkPaid(content, payPrices, voucherId), 3000); // Kiểm tra lại sau 30 giây
             }, 5000);
             return;
         }
 
         const data = await response.json();
-
+        console.log(data);
         if (data.data.records.length > 0) {
             const latestRecord = data.data.records[data.data.records.length - 1]; // Lấy giao dịch mới nhất
             const pricePaided = latestRecord.amount;
             const descPaided = latestRecord.description;
-            console.log(data.data.records);
-            console.log(pricePaided);
+            console.log(latestRecord);
+            console.log('pr'+pricePaided);
             console.log(descPaided);
 
             // Kiểm tra nếu thanh toán thành công
-            if (pricePaided >= price && descPaided.includes(content)) {
+            if (pricePaided >= payPrices && descPaided.includes(content)) {
                 const bank = 'Banking Payment'
                 console.log("Thanh toán thành công!");
-                window.location.href = `Orders?total=${total}&voucher=${voucherId}&transport=${transportId}&paymen=${bank}`;
+                window.location.href = `Orders?total=${payPrices+''}&voucher=${voucherId}&transport=${transportId}&payment=${bank}&shipPrice=${feeValue}`;
                 isSuccess = true;
             }
         }
@@ -150,4 +154,3 @@ const checkPaid = async (price, content, total,voucherId,transportId) => {
 function randomUppercaseLetters(length = 6) {
     return Array.from({length}, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
 }
-

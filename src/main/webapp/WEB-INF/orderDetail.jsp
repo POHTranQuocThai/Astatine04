@@ -38,7 +38,7 @@
                     <p>Date</p>
                     <p class="date">${Bill.orderDate}</p>
                     <p>Invoice #</p>
-                    <p class="invoice-number">BRA-00${Bill.orderId}</p>
+                    <p class="invoice-number">BRA-${Bill.orderId}</p>
                 </div>
             </div>
             <div class="company-info">

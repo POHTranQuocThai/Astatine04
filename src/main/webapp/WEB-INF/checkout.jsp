@@ -590,7 +590,7 @@ Author     : Tran Quoc Thai - CE181618
                                 </div>
                                 <c:set value="${totalPrice - discounted + ship}" var="totalLast"></c:set>
                                     <div class="input-radio">
-                                        <input onchange="handlePaid(10000)" type="radio" name="payment" id="payment-2">
+                                        <input onchange="handlePaid('${totalLast}','${voucherId}')" type="radio" name="payment" id="payment-2">
                                         <label for="payment-2">
                                             <span></span>
                                             Banking Payment
